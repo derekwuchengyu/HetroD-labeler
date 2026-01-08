@@ -1,0 +1,14 @@
+Retrive from HetroD(12種)
+EGO = {汽車，公車 }, 互動: 建議PET(post encroachment time)<2s
+a. ego直行遇到對向左轉車輛 { Car, Truck, Motor/Bike }於前
+b. ego左轉遇到對向直行{ Car, Truck,Motor/Bike}於前
+c. ego跟機踏車並行-機踏車加速通過
+d. ego跟機踏車並行-機踏車等速並行
+e. ego跟機踏車並行-機踏車減速
+f. ego同車道前方有停止車(有佔用到車道一點都算, ego通過之前沒動就算, e.g.前方車等左轉/臨停機車汽車)
+g. ego前方{Car, Truck, Motor/Bike}從右側cut-in
+h. ego前方{Car, Truck, Motor/Bike}從左側cut-in
+i. ego右轉,右側機踏車直行通過(騎去待轉區也算)
+k. ego右轉完遇見行人通過
+I. ego左轉完遇見行人通過
+m. ego左轉遇到對向機踏車要待轉

@@ -1,0 +1,16 @@
+{
+  "827_817": {
+    "ego_id": "827",
+    "actor_id": "817",
+    "min_frame": "14139",
+    "max_frame": "14761",
+    "label_idx": 1
+  },
+  "836_817": {
+    "ego_id": "836",
+    "actor_id": "817",
+    "min_frame": "14155",
+    "max_frame": "15013",
+    "label_idx": 1
+  }
+}
