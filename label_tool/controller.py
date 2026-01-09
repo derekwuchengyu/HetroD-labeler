@@ -2,12 +2,17 @@ from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow
 from PyQt6.QtGui import QIcon, QFont
 
 from video_controller import video_controller
-import ujson
+import orjson
+import pickle
 import os
 from datetime import datetime
 
 
+
 class MainWindow_controller(QMainWindow):
+    # 檔案快取
+    _file_cache = {}
+    
     def __init__(self, ui_class):
         super().__init__() 
         self.ui = ui_class()  # 使用傳入的 UI 類別
@@ -26,13 +31,13 @@ class MainWindow_controller(QMainWindow):
 
         # we load the dict for ego id and object id list
         with open(f'{self.data_path}/trackid_objects.json', 'r', encoding='utf-8') as f:
-            self.id_list = ujson.load(f)
+            self.id_list = orjson.loads(f.read())
         # load pet and min distance dictory 
         with open(f'{self.data_path}/pet_distance_dict.json', 'r', encoding='utf-8') as f:
-            self.pet_min_distance_dict = ujson.load(f)
+            self.pet_min_distance_dict = orjson.loads(f.read())
 
         with open(f'{self.data_path}/trackid_class.json', 'r', encoding='utf-8') as f:
-            self.trackid_class = ujson.load(f)
+            self.trackid_class = orjson.loads(f.read())
 
         ego_id_list = list(self.id_list.keys())
 
@@ -131,7 +136,7 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
                 try:
-                    ego_done_list = ujson.load(f)
+                    ego_done_list = orjson.loads(f.read())
                 except Exception:
                     ego_done_list = []
         else:
@@ -276,7 +281,7 @@ class MainWindow_controller(QMainWindow):
 
             # remove ego id from file and from combobox and select next ego id
             with open(f'{self.data_path}/trackid_objects.json', 'r', encoding='utf-8') as f:
-                self.id_list = ujson.load(f)
+                self.id_list = orjson.loads(f.read())
             
             current_index = self.ui.comboBox_ego_id.currentIndex()
             current_ego_id = self.ui.comboBox_ego_id.currentText()
@@ -288,7 +293,7 @@ class MainWindow_controller(QMainWindow):
                 del self.id_list[current_ego_id]
                 # 寫回檔案
                 with open(f'{self.data_path}/trackid_objects.json', 'w', encoding='utf-8') as f:
-                    ujson.dump(self.id_list, f, ensure_ascii=False)
+                    orjson.dumps(self.id_list, f, ensure_ascii=False)
 
                 # 更新 combobox
                 self.ui.comboBox_ego_id.clear()
@@ -392,7 +397,7 @@ class MainWindow_controller(QMainWindow):
             if os.path.exists(save_path):
                 with open(save_path, "r", encoding="utf-8") as f:
                     try:
-                        labeled_dict = ujson.load(f)
+                        labeled_dict = orjson.loads(f.read())
                     except Exception:
                         labeled_dict = {}
             else:
@@ -531,7 +536,7 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
                 try:
-                    labeled_dict = ujson.load(f)
+                    labeled_dict = orjson.loads(f.read())
                     if key in labeled_dict:
                         selected_label_idx = labeled_dict[key].get("label_idx", None)
                 except Exception:
@@ -545,7 +550,7 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(complex_path):
             with open(complex_path, "r", encoding="utf-8") as f:
                 try:
-                    complex_dict = ujson.load(f)
+                    complex_dict = orjson.loads(f.read())
                     if key in complex_dict:
                         self.selected_label_idx_99 = True
                 except Exception:
@@ -557,7 +562,7 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(special_path):
             with open(special_path, "r", encoding="utf-8") as f:
                 try:
-                    special_dict = ujson.load(f)
+                    special_dict = orjson.loads(f.read())
                     if key in special_dict:
                         self.selected_special_scenario = True
                 except Exception:
@@ -581,9 +586,9 @@ class MainWindow_controller(QMainWindow):
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
             elif i in blue_labels:
-                btn.setStyleSheet("color: white;")
-            else:
                 btn.setStyleSheet("color: gray;")
+            else:
+                btn.setStyleSheet("color: white;")
 
         # 設定 label_99 和 special_scenario 按鈕顏色
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
@@ -724,32 +729,18 @@ class MainWindow_controller(QMainWindow):
     def _save_to_json(self, file_name, key, data):
         """通用儲存輔助函式"""
         path = os.path.join(self.data_path, file_name)
-        content = {}
-        if os.path.exists(path):
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    content = ujson.load(f)
-            except: content = {}
-        
+        content = self._load_json_file(path)
         content[key] = data
-        with open(path, "w", encoding="utf-8") as f:
-            ujson.dump(content, f, ensure_ascii=False, indent=2)
-
+        self._save_json_file(path, content)
         print(f"已儲存 scenario: {data}")
 
     def _remove_from_json(self, file_name, key):
         """通用刪除輔助函式"""
         path = os.path.join(self.data_path, file_name)
-        if os.path.exists(path):
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    content = ujson.load(f)
-                if key in content:
-                    del content[key]
-                    with open(path, "w", encoding="utf-8") as f:
-                        ujson.dump(content, f, ensure_ascii=False, indent=2)
-            except: pass
-
+        content = self._load_json_file(path)
+        if key in content:
+            del content[key]
+            self._save_json_file(path, content)
         print(f"已移除 scenario: {key}")
 
 
@@ -766,21 +757,11 @@ class MainWindow_controller(QMainWindow):
             return
 
         save_path = os.path.join(self.data_path, "ego_done.json")
-        # 讀取已完成的 ego_id
-        if os.path.exists(save_path):
-            with open(save_path, "r", encoding="utf-8") as f:
-                try:
-                    ego_done_list = ujson.load(f)
-                except Exception:
-                    ego_done_list = []
-        else:
-            ego_done_list = []
+        ego_done_list = self._load_json_file(save_path)
 
-        # 加入 ego_id（不重複）
         if ego_id not in ego_done_list:
             ego_done_list.append(ego_id)
-            with open(save_path, "w", encoding="utf-8") as f:
-                ujson.dump(ego_done_list, f, ensure_ascii=False, indent=2)
+            self._save_json_file(save_path, ego_done_list)
             print(f"已標記 ego_id {ego_id} 為已完成")
         else:
             print(f"ego_id {ego_id} 已經標記過")

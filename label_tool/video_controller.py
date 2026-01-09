@@ -4,7 +4,7 @@ from PyQt6.QtCore import QTimer, Qt
 import numpy as np
 from math import pi
 import cv2 
-import ujson
+import orjson
 
 from superqt import QRangeSlider
 from PyQt6.QtWidgets import QMessageBox, QFileDialog
@@ -76,11 +76,11 @@ class video_controller(object):
 
         # load trackid to class 
         with open(f'{self.data_path}/trackid_class.json', 'r', encoding='utf-8') as f:
-            self.trackid_class = ujson.load(f)
+            self.trackid_class = orjson.loads(f.read())
 
         # load the track dict 
         with open(f'{self.data_path}/track_frame_dict.json', 'r', encoding='utf-8') as f:
-            self.track_dict = ujson.load(f)
+            self.track_dict = orjson.loads(f.read())
 
         self.current_frame_no = 0
         self.videoplayer_state = "play"
@@ -117,7 +117,7 @@ class video_controller(object):
 
     def reloaded_track_dict(self):
         with open(f'{self.data_path}/track_frame_dict.json', 'r', encoding='utf-8') as f:
-            self.track_dict = ujson.load(f)
+            self.track_dict = orjson.loads(f.read())
     
     def toggle_show_object_location(self):
         self.show_object_location_trigger = not self.show_object_location_trigger
@@ -205,7 +205,7 @@ class video_controller(object):
 
         # 寫回檔案
         with open(f'{self.data_path}/track_frame_dict.json', 'w', encoding='utf-8') as f:
-            ujson.dump(self.track_dict, f, ensure_ascii=False)
+            orjson.dumps(self.track_dict, f, ensure_ascii=False)
 
         print(f"已移除 {current_ego_id} 不在 {min_frame_idx}~{max_frame_idx} 範圍的 frame")
         

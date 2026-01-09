@@ -2,7 +2,7 @@ from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QProgressBar
 from PyQt6.QtGui import QIcon, QFont
 import pandas as pd
-import ujson
+import orjson
 import os
 from time import time
 from video_controller import video_controller
@@ -17,7 +17,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.setupUi(self)
 
         # 設定要篩選的 label_idx 值
-        LABEL_IDX = 1
+        LABEL_IDX = 2
 
         # 根據 UI 模組決定 ToolTip 字體大小
         
@@ -32,11 +32,11 @@ class MainWindow_controller(QMainWindow):
         start_time = time()
         # load trackid to class 
         with open(f'{self.data_path}/trackid_class.json', 'r', encoding='utf-8') as f:
-            self.trackid_class = ujson.load(f)
+            self.trackid_class = orjson.loads(f.read())
         print(f"load trackid_class.json time: {time() - start_time:.2f} sec")
 
         # with open(f'{self.data_path}/pet_distance_dict.json', 'r', encoding='utf-8') as f:
-        #     self.pet_min_distance_dict = ujson.load(f)
+        #     self.pet_min_distance_dict = orjson.loads(f.read())
         self.pet_results_df = pd.read_parquet('../data/pet_results_optimized.parquet')
         
         print(f"load pet_distance_dict.parquet time: {time() - start_time:.2f} sec")
@@ -59,7 +59,7 @@ class MainWindow_controller(QMainWindow):
         print(f"load labeled_scenarios.json time: {time() - start_time:.2f} sec")
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
-                labeled_dict = ujson.load(f)
+                labeled_dict = orjson.loads(f.read())
         else:
             return
         
@@ -161,7 +161,7 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
                 try:
-                    labeled_dict = ujson.load(f)
+                    labeled_dict = orjson.loads(f.read())
                     if current_id_pair in labeled_dict:
                         selected_label_idx = labeled_dict[current_id_pair].get("label_idx", None)
                 except Exception:
@@ -175,7 +175,7 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(complex_path):
             with open(complex_path, "r", encoding="utf-8") as f:
                 try:
-                    complex_dict = ujson.load(f)
+                    complex_dict = orjson.loads(f.read())
                     if current_id_pair in complex_dict:
                         self.selected_label_idx_99 = True
                 except Exception:
@@ -187,7 +187,7 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(special_path):
             with open(special_path, "r", encoding="utf-8") as f:
                 try:
-                    special_dict = ujson.load(f)
+                    special_dict = orjson.loads(f.read())
                     if current_id_pair in special_dict:
                         self.selected_special_scenario = True
                 except Exception:
@@ -211,9 +211,9 @@ class MainWindow_controller(QMainWindow):
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
             elif i in blue_labels:
-                btn.setStyleSheet("color: white;")
-            else:
                 btn.setStyleSheet("color: gray;")
+            else:
+                btn.setStyleSheet("color: white;")
 
         # 設定 label_99 和 special_scenario 按鈕顏色
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
@@ -385,12 +385,14 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(path):
             try:
                 with open(path, "r", encoding="utf-8") as f:
-                    content = ujson.load(f)
+                    content = orjson.loads(f.read())
             except: content = {}
         
         content[key] = data
-        with open(path, "w", encoding="utf-8") as f:
-            ujson.dump(content, f, ensure_ascii=False, indent=2)
+        flags = orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
+        json_bytes = orjson.dumps(content, option=flags)
+        with open(path, "wb") as f:
+            f.write(json_bytes)
 
         print(f"已儲存 scenario: {data}")
 
@@ -400,11 +402,13 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(path):
             try:
                 with open(path, "r", encoding="utf-8") as f:
-                    content = ujson.load(f)
+                    content = orjson.loads(f.read())
                 if key in content:
                     del content[key]
-                    with open(path, "w", encoding="utf-8") as f:
-                        ujson.dump(content, f, ensure_ascii=False, indent=2)
+                    flags = orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS
+                    json_bytes = orjson.dumps(content, option=flags)
+                    with open(path, "wb") as f:
+                        f.write(json_bytes)
             except: pass
 
         print(f"已移除 scenario: {key}")

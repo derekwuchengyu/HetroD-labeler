@@ -69,9 +69,9 @@
     <property name="geometry">
      <rect>
       <x>1180</x>
-      <y>650</y>
-      <width>141</width>
-      <height>51</height>
+      <y>620</y>
+      <width>111</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="text">
@@ -100,23 +100,23 @@
    <widget class="QPushButton" name="pushButton_show_object_location">
     <property name="geometry">
      <rect>
-      <x>1180</x>
-      <y>590</y>
-      <width>141</width>
-      <height>51</height>
+      <x>1390</x>
+      <y>521</y>
+      <width>110</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="text">
-     <string>顯示 Actor 的位置</string>
+     <string>顯示 Actor 位置</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_next_actor">
     <property name="geometry">
      <rect>
-      <x>1180</x>
-      <y>530</y>
-      <width>141</width>
-      <height>51</height>
+      <x>1350</x>
+      <y>170</y>
+      <width>150</width>
+      <height>60</height>
      </rect>
     </property>
     <property name="text">
@@ -127,7 +127,7 @@
     <property name="geometry">
      <rect>
       <x>1520</x>
-      <y>0</y>
+      <y>4</y>
       <width>141</width>
       <height>51</height>
      </rect>
@@ -298,10 +298,10 @@
    <widget class="QPushButton" name="pushButton_label_notice_on">
     <property name="geometry">
      <rect>
-      <x>1360</x>
-      <y>680</y>
-      <width>141</width>
-      <height>51</height>
+      <x>1390</x>
+      <y>480</y>
+      <width>110</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="text">
@@ -334,10 +334,10 @@
    <widget class="QPushButton" name="pushButton_make_video_gif">
     <property name="geometry">
      <rect>
-      <x>1360</x>
-      <y>740</y>
-      <width>141</width>
-      <height>51</height>
+      <x>1289</x>
+      <y>480</y>
+      <width>100</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="text">
@@ -389,10 +389,10 @@
    <widget class="QTableWidget" name="tableWidget_label_info">
     <property name="geometry">
      <rect>
-      <x>1180</x>
+      <x>1190</x>
       <y>240</y>
-      <width>321</width>
-      <height>281</height>
+      <width>311</width>
+      <height>231</height>
      </rect>
     </property>
    </widget>
@@ -407,6 +407,45 @@
     </property>
     <property name="text">
      <string>已檢查</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_prev_actor">
+    <property name="geometry">
+     <rect>
+      <x>1190</x>
+      <y>170</y>
+      <width>150</width>
+      <height>60</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Prev Actor</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_label_99">
+    <property name="geometry">
+     <rect>
+      <x>1370</x>
+      <y>720</y>
+      <width>141</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>不只一種scenario</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_special_scenario">
+    <property name="geometry">
+     <rect>
+      <x>1370</x>
+      <y>770</y>
+      <width>141</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>特別Scenario(含違規)</string>
     </property>
    </widget>
    <zorder>label_3</zorder>
@@ -438,6 +477,9 @@
    <zorder>label_combobox_ego_id</zorder>
    <zorder>tableWidget_label_info</zorder>
    <zorder>pushButton_check_label_done</zorder>
+   <zorder>pushButton_prev_actor</zorder>
+   <zorder>pushButton_label_99</zorder>
+   <zorder>pushButton_special_scenario</zorder>
   </widget>
  </widget>
  <resources/>
