@@ -39,7 +39,8 @@ class MainWindow_controller(QMainWindow):
         #     self.pet_min_distance_dict = orjson.loads(f.read())
         # --- 改為從 parquet 讀取 ---
         
-        parquet_path = os.path.join(self.data_path, f"{self.DATA_ID}_pet_collisions.parquet")
+        # parquet_path = os.path.join(self.data_path, f"{self.DATA_ID}_pet_collisions.parquet")
+        parquet_path = os.path.join(self.data_path, f"{self.DATA_ID}_pet_optimized.parquet")
         pet_df = pd.read_parquet(parquet_path)
         self.pet_min_distance_dict = {}
         for row in pet_df.itertuples(index=False):
@@ -481,6 +482,8 @@ class MainWindow_controller(QMainWindow):
 
 
         self.video_controller.update_video_info()
+        # 新增: 更新 range slider bar
+        self.video_controller.update_range_slider_bar()
 
 
         # update label info

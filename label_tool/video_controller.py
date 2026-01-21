@@ -5,6 +5,7 @@ import numpy as np
 from math import pi
 import cv2 
 import orjson
+import os  # add for file path
 
 from superqt import QRangeSlider
 from PyQt6.QtWidgets import QMessageBox, QFileDialog
@@ -51,18 +52,18 @@ class video_controller(object):
 
         # 設定速度選單
         self.speed_map = {
-            "30": 30,    # 30ms 間隔
-            "15": 15,    # 2ms 間隔
+            "10": 10,  # 10ms 間隔
+            "5": 5,    # 5ms 間隔
+            "2": 2,    # 2ms 間隔
             "1": 1     # 1ms 間隔
         }
         self.ui.comboBox_speed.clear()
         self.ui.comboBox_speed.addItems(list(self.speed_map.keys()))
         self.ui.comboBox_speed.setCurrentText("1")
 
-        # self.ui.comboBox_speed.currentTextChanged.connect(self.change_speed)
+        self.ui.comboBox_speed.currentTextChanged.connect(self.change_speed)
         
-        self.current_speed_interval = self.speed_map["30"]
-
+        self.current_speed_interval = self.speed_map["1"]
 
 
         # 動態新增 QRangeSlider
@@ -110,11 +111,12 @@ class video_controller(object):
 
 
     def change_speed(self, speed_label):
-        # print(speed_label)
+        print(speed_label)
         self.current_speed_interval = self.speed_map.get(speed_label, 30)
-        if self.videoplayer_state == "play":
-            self.timer.stop()
-            self.timer.start(self.current_speed_interval)
+        self.timer.setInterval(self.current_speed_interval)
+        # if self.videoplayer_state == "play":
+        #     self.timer.stop()
+        #     self.timer.start(self.current_speed_interval)
 
     def reloaded_track_dict(self):
         with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'r', encoding='utf-8') as f:
@@ -150,36 +152,47 @@ class video_controller(object):
         )
 
         if overlay_frames:
-
-            # 2 9 514 
-
             offset = 600
             min_overlay = int(overlay_frames[0])
             max_overlay = int(overlay_frames[-1])
-            # 擴大範圍
             min_target = min_overlay - offset  if min_overlay - offset >= 0 else 0
             max_target = max_overlay + offset
-            # 取得 ego id frame list 在這個範圍內的 frame
             self.overlay_frame_list = [
                 f for f in sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
                 if min_target <= int(f) <= max_target
             ]
 
-        
         self.total_frame_count = len(self.overlay_frame_list)
 
-
         self.ui.slider_videoframe.setRange(0, self.total_frame_count-1)
-        
-
         self.range_slider.setMinimum(0)
         self.range_slider.setMaximum(self.total_frame_count-1)
         self.range_slider.setValue((0, self.total_frame_count-1))
 
-        
-        self.current_frame_no = 0                
-        self.ui.slider_videoframe.setValue(self.current_frame_no)  # 這行會同步滑軌
-
+        # 新增：根據 labeled_scenarios.json 設定預設 range
+        labeled_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
+        key = f"{self.current_ego_id}_{self.current_other_actor_id}"
+        min_idx = 0
+        max_idx = self.total_frame_count - 1
+        if os.path.exists(labeled_path):
+            try:
+                with open(labeled_path, "r", encoding="utf-8") as f:
+                    labeled_dict = orjson.loads(f.read())
+                info = labeled_dict.get(key)
+                if info and "min_frame" in info and "max_frame" in info:
+                    frame_to_idx = {int(f): idx for idx, f in enumerate(self.overlay_frame_list)}
+                    min_frame = info["min_frame"]
+                    max_frame = info["max_frame"]
+                    min_idx = frame_to_idx.get(int(min_frame), min_idx)
+                    max_idx = frame_to_idx.get(int(max_frame), max_idx)
+                    self.range_slider.setValue((min_idx, max_idx))
+                    self.current_frame_no = min_idx
+                    self.ui.slider_videoframe.setValue(self.current_frame_no)
+            except Exception:
+                pass
+        else:
+            self.current_frame_no = 0
+            self.ui.slider_videoframe.setValue(self.current_frame_no)
 
         frame = self.image_background.copy()
 
@@ -187,7 +200,63 @@ class video_controller(object):
 
         self.__update_label_frame(frame)
 
-        
+        # 新增: 更新 range slider bar 標記
+        self.update_range_slider_bar()
+
+    def update_range_slider_bar(self):
+        """
+        根據 labeled_scenarios.json 的 min_frame, max_frame，更新 range_slider 的 bar 標記
+        """
+        # 取得 ego_id 和 actor_id
+        ego_id = self.ui.comboBox_ego_id.currentText()
+        actor_id = self.ui.comboBox_other_actor_id.currentText()
+        data_path = self.data_path
+        DATA_ID = self.DATA_ID
+
+        labeled_path = os.path.join(data_path, f"{DATA_ID}_labeled_scenarios.json")
+        if not os.path.exists(labeled_path):
+            self.range_slider.setSpanStyle([])  # 清空 bar 標記
+            return
+
+        import orjson
+        try:
+            with open(labeled_path, "r", encoding="utf-8") as f:
+                labeled_dict = orjson.loads(f.read())
+        except Exception:
+            self.range_slider.setSpanStyle([])
+            return
+
+        # overlay_frame_list: frame_no -> index
+        frame_to_idx = {int(f): idx for idx, f in enumerate(self.overlay_frame_list)}
+
+        # 收集所有已標註的範圍
+        bar_ranges = []
+        for key, info in labeled_dict.items():
+            if not isinstance(info, dict):
+                continue
+            min_frame = info.get("min_frame")
+            max_frame = info.get("max_frame")
+            if min_frame is None or max_frame is None:
+                continue
+            # 只顯示同一個 ego_id
+            if info.get("ego_id") != ego_id:
+                continue
+            # 轉換成 index
+            min_idx = frame_to_idx.get(int(min_frame))
+            max_idx = frame_to_idx.get(int(max_frame))
+            if min_idx is not None and max_idx is not None:
+                bar_ranges.append((min_idx, max_idx))
+
+        # 設定 range_slider 的 bar 標記
+        # superqt QRangeSlider 支援 setSpanStyle (或 setSpan) 來顯示多段 bar
+        # 這裡假設 setSpanStyle 接收 [(start, end), ...]
+        if hasattr(self.range_slider, "setSpanStyle"):
+            self.range_slider.setSpanStyle(bar_ranges)
+        elif hasattr(self.range_slider, "setSpan"):  # 舊版
+            self.range_slider.setSpan(bar_ranges)
+        # 若不支援，則略過
+
+    
     def remove_frames_outside_range(self):
         # 取得 range_slider 範圍
         min_frame_idx, max_frame_idx = self.range_slider.value()
@@ -318,9 +387,7 @@ class video_controller(object):
             self.setslidervalue(max_frame)
 
     def timer_timeout_job(self):
-
         frame = self.image_background.copy()
-
         self.__update_label_frame(frame)
         min_frame, max_frame = self.range_slider.value()
 
@@ -328,12 +395,23 @@ class video_controller(object):
             self.videoplayer_state = "play"
             self.update_play_or_stop_button_text()
 
+        # 根據 interval 設定每次跳過的 frame 數
+        # 1ms: 跳5, 15ms: 跳2, 30ms: 跳1
+        if self.current_speed_interval == 2:
+            step = 2
+        elif self.current_speed_interval == 5:
+            step = 5
+        elif self.current_speed_interval == 10:
+            step = 10
+        else:
+            step = 1
 
-        if self.current_frame_no >= max_frame:
+        if self.current_frame_no + step > max_frame:
+            self.current_frame_no = max_frame
             self.videoplayer_state = "stop"
             self.update_play_or_stop_button_text()
         else:
-            self.current_frame_no += 1
+            self.current_frame_no += step
             self.setslidervalue(self.current_frame_no)
 
     def getslidervalue(self,  value=None):

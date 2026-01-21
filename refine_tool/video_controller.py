@@ -92,7 +92,6 @@ class video_controller(object):
             }
         """)
         self.ui.verticalLayout.addWidget(self.secondary_slider)
-
         # 2. 再新增 range_slider (它會排在 secondary_slider 下面)
         self.range_slider = QRangeSlider(Qt.Horizontal)
         self.ui.verticalLayout.addWidget(self.range_slider)

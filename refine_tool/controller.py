@@ -11,7 +11,7 @@ from datetime import datetime
 
 
 class MainWindow_controller(QMainWindow):
-    def __init__(self, ui_class, DATA_ID='01'):
+    def __init__(self, ui_class, DATA_ID='00'):
         super().__init__() 
         self.ui = ui_class()  # 使用傳入的 UI 類別
         self.ui.setupUi(self)
@@ -357,25 +357,23 @@ class MainWindow_controller(QMainWindow):
         min_frame = self.video_controller.overlay_frame_list[min_frame]
         max_frame = self.video_controller.overlay_frame_list[max_frame]
 
-        scenario = {
-            "ego_id": ego_id,
-            "actor_id": actor_id,
+        scenario_data = {
+            "id_pair": id_pair,
             "min_frame": min_frame,
             "max_frame": max_frame,
-            "label_idx": self.selected_label_idx
+            "label_idx": self.selected_label_idx,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        key = f"{ego_id}_{actor_id}"
-
         # 儲存至主檔案 (labeled_scenarios.json)
-        self._save_to_json(f"{self.DATA_ID}_labeled_scenarios.json", key, scenario)
+        self._save_to_json(f"{self.DATA_ID}_labeled_scenarios.json", id_pair, scenario_data)
 
         # 處理 label 99 的獨立存檔 (complex_scenarios.json)
         if self.selected_label_idx_99:
             # 存入或更新獨立檔
-            self._save_to_json(f"{self.DATA_ID}_complex_scenarios.json", key, scenario)
+            self._save_to_json(f"{self.DATA_ID}_complex_scenarios.json", id_pair, scenario_data)
         else:
             # 如果目前不含 99，嘗試從獨立檔移除該 key
-            self._remove_from_json(f"{self.DATA_ID}_complex_scenarios.json", key)
+            self._remove_from_json(f"{self.DATA_ID}_complex_scenarios.json", id_pair)
 
         # 更新按鈕顏色
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")

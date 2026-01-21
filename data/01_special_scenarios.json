@@ -1,1 +1,18 @@
-{}
+{
+  "5_66": {
+    "ego_id": "5",
+    "actor_id": "66",
+    "min_frame": "0",
+    "max_frame": "543",
+    "label_idx": null,
+    "timestamp": "2026-01-21 17:12:19"
+  },
+  "5_20": {
+    "ego_id": "5",
+    "actor_id": "20",
+    "min_frame": "0",
+    "max_frame": "543",
+    "label_idx": null,
+    "timestamp": "2026-01-21 17:14:36"
+  }
+}
