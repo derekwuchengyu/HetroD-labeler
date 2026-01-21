@@ -155,6 +155,8 @@ class MainWindow_controller(QMainWindow):
                     ego_done_list = []
         else:
             ego_done_list = []
+            with open(save_path, "wb") as f:
+                f.write(orjson.dumps(ego_done_list))
 
         if self.show_only_unlabeled_ego:
             # 過濾未標註過的 ego_id
@@ -308,9 +310,9 @@ class MainWindow_controller(QMainWindow):
             if current_ego_id in self.id_list:
                 del self.id_list[current_ego_id]
                 # 寫回檔案
-                with open(f'{self.data_path}/{self.DATA_ID}_trackid_objects.json', 'w', encoding='utf-8') as f:
-                    orjson.dumps(self.id_list, f, ensure_ascii=False)
-
+                with open(f'{self.data_path}/{self.DATA_ID}_trackid_objects.json', 'wb') as f:
+                    f.write(orjson.dumps(self.id_list, option=orjson.OPT_INDENT_2))
+                    
                 # 更新 combobox
                 self.ui.comboBox_ego_id.clear()
                 for ego_id in self.id_list.keys():
@@ -785,6 +787,7 @@ class MainWindow_controller(QMainWindow):
 
         save_path = os.path.join(self.data_path, f"{self.DATA_ID}_ego_done.json")
         ego_done_list = self._load_json_file(save_path)
+        print(ego_done_list)
 
         if ego_id not in ego_done_list:
             ego_done_list.append(ego_id)

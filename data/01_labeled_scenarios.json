@@ -86,5 +86,45 @@
     "max_frame": "1346",
     "label_idx": 3,
     "timestamp": "2026-01-21 10:18:02"
+  },
+  "0_40": {
+    "ego_id": "0",
+    "actor_id": "40",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 11:58:44"
+  },
+  "0_10": {
+    "ego_id": "0",
+    "actor_id": "10",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 11:58:47"
+  },
+  "0_35": {
+    "ego_id": "0",
+    "actor_id": "35",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 11:58:50"
+  },
+  "0_8": {
+    "ego_id": "0",
+    "actor_id": "8",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 11:58:56"
+  },
+  "0_2": {
+    "ego_id": "0",
+    "actor_id": "2",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 11:59:03"
   }
 }

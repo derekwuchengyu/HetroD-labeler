@@ -205,8 +205,8 @@ class video_controller(object):
                 del self.track_dict[str(current_ego_id)][key]
 
         # 寫回檔案
-        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'w', encoding='utf-8') as f:
-            orjson.dumps(self.track_dict, f, ensure_ascii=False)
+        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', "wb") as f:
+            f.write(orjson.dumps(self.track_dict, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
 
         print(f"已移除 {current_ego_id} 不在 {min_frame_idx}~{max_frame_idx} 範圍的 frame")
         
