@@ -14,5 +14,13 @@
     "max_frame": "543",
     "label_idx": null,
     "timestamp": "2026-01-21 17:14:36"
+  },
+  "2_90": {
+    "ego_id": "2",
+    "actor_id": "90",
+    "min_frame": "797",
+    "max_frame": "1346",
+    "label_idx": null,
+    "timestamp": "2026-01-21 21:41:33"
   }
 }
