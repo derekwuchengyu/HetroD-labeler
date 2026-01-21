@@ -11,13 +11,13 @@ from datetime import datetime
 
 
 class MainWindow_controller(QMainWindow):
-    def __init__(self, ui_class):
+    def __init__(self, ui_class, DATA_ID='01'):
         super().__init__() 
         self.ui = ui_class()  # 使用傳入的 UI 類別
         self.ui.setupUi(self)
 
         # 設定要篩選的 label_idx 值
-        LABEL_IDX = 2
+        LABEL_IDX = 9
 
         # 根據 UI 模組決定 ToolTip 字體大小
         
@@ -28,16 +28,18 @@ class MainWindow_controller(QMainWindow):
 
 
         self.data_path = "../data"
+        self.DATA_ID = DATA_ID  # <--- 請根據實際需求設置
 
+        print(f"Loading track #{self.DATA_ID} data...")
         start_time = time()
         # load trackid to class 
-        with open(f'{self.data_path}/trackid_class.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_trackid_class.json', 'r', encoding='utf-8') as f:
             self.trackid_class = orjson.loads(f.read())
         print(f"load trackid_class.json time: {time() - start_time:.2f} sec")
 
         # with open(f'{self.data_path}/pet_distance_dict.json', 'r', encoding='utf-8') as f:
         #     self.pet_min_distance_dict = orjson.loads(f.read())
-        self.pet_results_df = pd.read_parquet('../data/pet_results_optimized.parquet')
+        self.pet_results_df = pd.read_parquet(f'../data/{self.DATA_ID}_pet_collisions.parquet')
         
         print(f"load pet_distance_dict.parquet time: {time() - start_time:.2f} sec")
 
@@ -45,17 +47,16 @@ class MainWindow_controller(QMainWindow):
         # 建立 lookup table（O(1) 查詢）
         self.pet_lookup = {}
         for row in self.pet_results_df.itertuples(index=False):
-            a1 = str(row.agent1_id)
-            a2 = str(row.agent2_id)
-            value = (row.min_distance, row.pet)
+            a1 = str(row.track_id1)
+            a2 = str(row.track_id2)
 
-            self.pet_lookup[(a1, a2)] = value
-            self.pet_lookup[(a2, a1)] = value
+            self.pet_lookup[(a1, a2)] = (row.min_distance, row.pet)
+            self.pet_lookup[(a2, a1)] = (row.min_distance, -row.pet)
 
         print(f"load pet_lookup time: {time() - start_time:.2f} sec")
 
         # load labeled scenarios 
-        save_path = os.path.join(self.data_path, "labeled_scenarios.json")
+        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
         print(f"load labeled_scenarios.json time: {time() - start_time:.2f} sec")
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
@@ -82,7 +83,8 @@ class MainWindow_controller(QMainWindow):
 
         self.current_id_pair = self.ui.comboBox_ego_id.currentText()
 
-        self.video_controller = video_controller(data_path=self.data_path, ui=self.ui)
+        print("Initializing video controller...")
+        self.video_controller = video_controller(data_path=self.data_path, ui=self.ui, DATA_ID=self.DATA_ID)
         self.label_tooltip_on = False  # 預設關閉
 
         self.ui.comboBox_ego_id.currentIndexChanged.connect(self.update_combobox_label_info)
@@ -146,7 +148,7 @@ class MainWindow_controller(QMainWindow):
 
         ##
         checked_list = []
-        path = os.path.join(self.data_path, "label_check.txt")
+        path = os.path.join(self.data_path, f"{self.DATA_ID}_label_check.txt")
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
                 checked_list = f.read().splitlines()
@@ -156,7 +158,7 @@ class MainWindow_controller(QMainWindow):
             self.ui.pushButton_check_label_done.setStyleSheet("color: black;")
 
         # 讀取已標註 scenario
-        save_path = os.path.join(self.data_path, "labeled_scenarios.json")
+        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
         selected_label_idx = None
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
@@ -170,7 +172,7 @@ class MainWindow_controller(QMainWindow):
         self.selected_label_idx = selected_label_idx
 
         # 讀取 label 99 標記
-        complex_path = os.path.join(self.data_path, "complex_scenarios.json")
+        complex_path = os.path.join(self.data_path, f"{self.DATA_ID}_complex_scenarios.json")
         self.selected_label_idx_99 = False
         if os.path.exists(complex_path):
             with open(complex_path, "r", encoding="utf-8") as f:
@@ -182,7 +184,7 @@ class MainWindow_controller(QMainWindow):
                     pass
 
         # 讀取特別scenario標記
-        special_path = os.path.join(self.data_path, "special_scenarios.json")
+        special_path = os.path.join(self.data_path, f"{self.DATA_ID}_special_scenarios.json")
         self.selected_special_scenario = False
         if os.path.exists(special_path):
             with open(special_path, "r", encoding="utf-8") as f:
@@ -335,7 +337,7 @@ class MainWindow_controller(QMainWindow):
         else:
             # 單一標籤選擇
             self.selected_label_idx = selected_idx
-            self.selected_label_idx_99 = False  # 重置 99 flag
+            # self.selected_label_idx_99 = False  # 重置 99 flag
 
         # 更新 UI 按鈕顏色
         for i in range(0, 14):
@@ -343,9 +345,9 @@ class MainWindow_controller(QMainWindow):
             if i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
             elif i in blue_labels:
-                btn.setStyleSheet("color: white;")
-            else:
                 btn.setStyleSheet("color: gray;")
+            else:
+                btn.setStyleSheet("color: white;")
 
         # 準備資料內容
         id = self.ui.comboBox_ego_id.currentText()
@@ -365,15 +367,15 @@ class MainWindow_controller(QMainWindow):
         key = f"{ego_id}_{actor_id}"
 
         # 儲存至主檔案 (labeled_scenarios.json)
-        self._save_to_json("labeled_scenarios.json", key, scenario)
+        self._save_to_json(f"{self.DATA_ID}_labeled_scenarios.json", key, scenario)
 
         # 處理 label 99 的獨立存檔 (complex_scenarios.json)
         if self.selected_label_idx_99:
             # 存入或更新獨立檔
-            self._save_to_json("complex_scenarios.json", key, scenario)
+            self._save_to_json(f"{self.DATA_ID}_complex_scenarios.json", key, scenario)
         else:
             # 如果目前不含 99，嘗試從獨立檔移除該 key
-            self._remove_from_json("complex_scenarios.json", key)
+            self._remove_from_json(f"{self.DATA_ID}_complex_scenarios.json", key)
 
         # 更新按鈕顏色
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
@@ -394,7 +396,7 @@ class MainWindow_controller(QMainWindow):
         with open(path, "wb") as f:
             f.write(json_bytes)
 
-        print(f"已儲存 scenario: {data}")
+        print(f"已儲存 scenario: {data} to {file_name}")
 
     def _remove_from_json(self, file_name, key):
         """通用刪除輔助函式"""
@@ -411,16 +413,16 @@ class MainWindow_controller(QMainWindow):
                         f.write(json_bytes)
             except: pass
 
-        print(f"已移除 scenario: {key}")
+        print(f"已移除 scenario: {key} from {file_name}")
 
     def click_time(self):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_path = os.path.join(self.data_path, "label_time_recording.txt")
+        log_path = os.path.join(self.data_path, f"{self.DATA_ID}_label_time_recording.txt")
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"按下時間：{current_time}\n")
 
     def save_current_checked(self):
-        path = os.path.join(self.data_path, "label_check.txt")
+        path = os.path.join(self.data_path, f"{self.DATA_ID}_label_check.txt")
         with open(path, "a", encoding="utf-8") as f:
             f.write(f"{self.ui.comboBox_ego_id.currentText()}\n")
 
@@ -450,9 +452,10 @@ class MainWindow_controller(QMainWindow):
 
         # 根據狀態新增或刪除
         if self.selected_special_scenario:
-            self._save_to_json("special_scenarios.json", key, scenario)
+            self._save_to_json(f"{self.DATA_ID}_special_scenarios.json", key, scenario)
         else:
-            self._remove_from_json("special_scenarios.json", key)
+            self._remove_from_json(f"{self.DATA_ID}_special_scenarios.json", key)
 
         # 更新按鈕顏色
         self.ui.pushButton_special_scenario.setStyleSheet("color: red;" if self.selected_special_scenario else "color: black;")
+

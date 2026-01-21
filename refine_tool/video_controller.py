@@ -1,6 +1,7 @@
 from PyQt6 import QtCore 
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtWidgets import QSlider
 import numpy as np
 import cv2 
 import orjson
@@ -38,10 +39,10 @@ ortho_px_to_meter = 0.0499967249445942
 
 
 class video_controller(object):
-    def __init__(self, data_path,  ui):
-
+    def __init__(self, data_path,  ui, DATA_ID):
         self.data_path = data_path
         self.ui = ui
+        self.DATA_ID = DATA_ID  # <--- 請根據實際需求設置
 
         self.show_object_location_trigger = False  # 預設不顯示
 
@@ -66,7 +67,33 @@ class video_controller(object):
 
 
 
-        # 動態新增 QRangeSlider
+        # 1. 先新增 secondary_slider (它會排在上方/中間)
+        self.secondary_slider = QSlider(Qt.Orientation.Horizontal)
+        self.secondary_slider.setRange(0, 1)
+        # 套用先前建議的樣式（隱藏滑條、直線滑塊）
+        self.secondary_slider.setStyleSheet("""
+            QSlider::groove:horizontal {
+                height: 0px;
+                background: #C0C0C0;
+            }
+            QSlider::handle:horizontal {
+                /* 按鈕的外觀設定 */
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                                    stop:0 #666666, stop:1 #444444); /* 漸層色讓它更像按鈕 */
+                border: 1px solid #333;
+                width: 7px;      /* 增加寬度，讓它變寬 */
+                height: 20px;     /* 增加高度 */
+                margin: -10px 0;  /* 調整位置，讓它跨越軌道 */
+                border-radius: 4px; /* 圓角效果 */
+            }
+
+            QSlider::sub-page:horizontal, QSlider::add-page:horizontal {
+                background: transparent;
+            }
+        """)
+        self.ui.verticalLayout.addWidget(self.secondary_slider)
+
+        # 2. 再新增 range_slider (它會排在 secondary_slider 下面)
         self.range_slider = QRangeSlider(Qt.Horizontal)
         self.ui.verticalLayout.addWidget(self.range_slider)
 
@@ -77,11 +104,11 @@ class video_controller(object):
         self.image_height = self.image_background.shape[0]
 
         # load trackid to class 
-        with open(f'{self.data_path}/trackid_class.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_trackid_class.json', 'r', encoding='utf-8') as f:
             self.trackid_class = orjson.loads(f.read())
 
         # load the track dict 
-        with open(f'{self.data_path}/track_frame_dict.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'r', encoding='utf-8') as f:
             self.track_dict = orjson.loads(f.read())
 
         self.current_frame_no = 0
@@ -105,6 +132,7 @@ class video_controller(object):
 
         self.ui.slider_videoframe.valueChanged.connect(self.getslidervalue)
         self.range_slider.valueChanged.connect(self.on_range_slider_changed)
+        self.secondary_slider.valueChanged.connect(self.on_secondary_slider_changed)
 
         # 防止 setValue/valueChanged 互相遞迴的 reentrancy flag
         self._slider_updating = False
@@ -115,7 +143,7 @@ class video_controller(object):
         
 
     def reloaded_track_dict(self):
-        with open(f'{self.data_path}/track_frame_dict.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'r', encoding='utf-8') as f:
             self.track_dict = orjson.loads(f.read())
     
     def toggle_show_object_location(self):
@@ -138,7 +166,7 @@ class video_controller(object):
 
         # get label frame info 
 
-        save_path = os.path.join(self.data_path, "labeled_scenarios.json")
+        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
                 labeled_dict = orjson.loads(f.read())
@@ -157,7 +185,7 @@ class video_controller(object):
         )
 
     
-        offset = 1000  # 前後各擴大多少 frame
+        offset = 1200  # 前後各擴大多少 frame
         min_overlay = int(overlay_frames[0])
         max_overlay = int(overlay_frames[-1])
         # 擴大範圍
@@ -175,7 +203,7 @@ class video_controller(object):
 
 
         self.ui.slider_videoframe.setRange(0, self.total_frame_count-1)
-        
+        self.secondary_slider.setRange(0, self.total_frame_count-1)
 
         self.range_slider.setMinimum(0)
         self.range_slider.setMaximum(self.total_frame_count-1)
@@ -193,12 +221,12 @@ class video_controller(object):
         min_idx = self.overlay_frame_list.index(str(min_frame_in_all))
         max_idx = self.overlay_frame_list.index(str(max_frame_in_all))
         self.ui.slider_videoframe.setValue(min_idx)
+        self.secondary_slider.setValue(min_idx)
         self.range_slider.setValue((min_idx, max_idx))
 
         self.current_frame_no = min_idx            
-        self.ui.slider_videoframe.setValue(self.current_frame_no)  # 這行會同步滑軌
-    
-
+        self.ui.slider_videoframe.setValue(self.current_frame_no)
+        self.secondary_slider.setValue(self.current_frame_no)
 
         frame = self.image_background.copy()
 
@@ -224,7 +252,7 @@ class video_controller(object):
                 del self.track_dict[str(current_ego_id)][key]
 
         # 寫回檔案
-        with open(f'{self.data_path}/track_frame_dict.json', 'w', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'w', encoding='utf-8') as f:
             orjson.dumps(self.track_dict, f, ensure_ascii=False)
 
         print(f"已移除 {current_ego_id} 不在 {min_frame_idx}~{max_frame_idx} 範圍的 frame")
@@ -334,6 +362,32 @@ class video_controller(object):
         elif self.current_frame_no > max_frame:
             self.setslidervalue(max_frame)
 
+    def on_secondary_slider_changed(self, value):
+        # secondary slider 動作時的邏輯
+        if self._slider_updating:
+            return
+        try:
+            self._slider_updating = True
+            min_frame, max_frame = self.range_slider.value()
+            
+            # 若 value 超出 range_slider 範圍，自動擴大 range_slider
+            if value < min_frame:
+                min_frame = value
+            if value > max_frame:
+                max_frame = value
+            
+            self.range_slider.setValue((min_frame, max_frame))
+            
+            # 同步主滑桿
+            if self.ui.slider_videoframe.value() != value:
+                self.ui.slider_videoframe.setValue(value)
+            
+            self.current_frame_no = value
+            self.__update_label_frame(self.image_background.copy())
+            self.ui.slider_videoframe_label.setText(f"{self.current_frame_no + 1} / {self.total_frame_count}")
+        finally:
+            self._slider_updating = False
+
     def timer_timeout_job(self):
 
         frame = self.image_background.copy()
@@ -374,6 +428,7 @@ class video_controller(object):
                 if self.ui.slider_videoframe.value() != value:
                     self.ui.slider_videoframe.setValue(value)
             self.current_frame_no = value
+            self.secondary_slider.setValue(value)
             self.__update_label_frame(self.image_background.copy())
             self.ui.slider_videoframe_label.setText(f"{self.current_frame_no + 1} / {self.total_frame_count}")
         finally:
@@ -385,6 +440,7 @@ class video_controller(object):
             # 仍需更新 current_frame_no 與顯示，但不要再次觸發 signal
             min_frame, max_frame = self.range_slider.value()
             self.current_frame_no = max(min_frame, min(max_frame, value))
+            self.secondary_slider.setValue(self.current_frame_no)
             self.__update_label_frame(self.image_background.copy())
             self.ui.slider_videoframe_label.setText(f"{self.current_frame_no + 1} / {self.total_frame_count}")
             return
@@ -397,6 +453,8 @@ class video_controller(object):
             # 只有當 value 不同時才 setValue，避免不必要的 signal
             if self.ui.slider_videoframe.value() != value:
                 self.ui.slider_videoframe.setValue(value)
+            if self.secondary_slider.value() != value:
+                self.secondary_slider.setValue(value)
             self.__update_label_frame(self.image_background.copy())
             self.ui.slider_videoframe_label.setText(f"{self.current_frame_no + 1} / {self.total_frame_count}")
         finally:

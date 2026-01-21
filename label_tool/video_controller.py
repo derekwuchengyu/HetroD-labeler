@@ -39,10 +39,11 @@ ortho_px_to_meter = 0.0499967249445942
 
 
 class video_controller(object):
-    def __init__(self, data_path,  ui):
+    def __init__(self, data_path,  ui, DATA_ID):
 
         self.data_path = data_path
         self.ui = ui
+        self.DATA_ID = DATA_ID
 
         self.show_object_location_trigger = False  # 預設不顯示
 
@@ -70,16 +71,16 @@ class video_controller(object):
 
 
         # load brackground image 
-        self.image_background = cv2.imread(f'{self.data_path}/00_background.png')
+        self.image_background = cv2.imread(f'{self.data_path}/{self.DATA_ID}_background.png')
         self.image_width = self.image_background.shape[1]
         self.image_height = self.image_background.shape[0]
 
         # load trackid to class 
-        with open(f'{self.data_path}/trackid_class.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_trackid_class.json', 'r', encoding='utf-8') as f:
             self.trackid_class = orjson.loads(f.read())
 
         # load the track dict 
-        with open(f'{self.data_path}/track_frame_dict.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'r', encoding='utf-8') as f:
             self.track_dict = orjson.loads(f.read())
 
         self.current_frame_no = 0
@@ -116,7 +117,7 @@ class video_controller(object):
             self.timer.start(self.current_speed_interval)
 
     def reloaded_track_dict(self):
-        with open(f'{self.data_path}/track_frame_dict.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'r', encoding='utf-8') as f:
             self.track_dict = orjson.loads(f.read())
     
     def toggle_show_object_location(self):
@@ -152,7 +153,7 @@ class video_controller(object):
 
             # 2 9 514 
 
-            offset = 500
+            offset = 600
             min_overlay = int(overlay_frames[0])
             max_overlay = int(overlay_frames[-1])
             # 擴大範圍
@@ -204,7 +205,7 @@ class video_controller(object):
                 del self.track_dict[str(current_ego_id)][key]
 
         # 寫回檔案
-        with open(f'{self.data_path}/track_frame_dict.json', 'w', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'w', encoding='utf-8') as f:
             orjson.dumps(self.track_dict, f, ensure_ascii=False)
 
         print(f"已移除 {current_ego_id} 不在 {min_frame_idx}~{max_frame_idx} 範圍的 frame")

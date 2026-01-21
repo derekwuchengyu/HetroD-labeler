@@ -1,0 +1,90 @@
+{
+  "0_46": {
+    "ego_id": "0",
+    "actor_id": "46",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-15 10:58:49"
+  },
+  "0_21": {
+    "ego_id": "0",
+    "actor_id": "21",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-14 21:51:46"
+  },
+  "0_11": {
+    "ego_id": "0",
+    "actor_id": "11",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-14 21:51:54"
+  },
+  "0_30": {
+    "ego_id": "0",
+    "actor_id": "30",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 10:15:26"
+  },
+  "0_36": {
+    "ego_id": "0",
+    "actor_id": "36",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 10:15:43"
+  },
+  "0_19": {
+    "ego_id": "0",
+    "actor_id": "19",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 10:16:45"
+  },
+  "0_27": {
+    "ego_id": "0",
+    "actor_id": "27",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 10:17:01"
+  },
+  "0_62": {
+    "ego_id": "0",
+    "actor_id": "62",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 10:17:07"
+  },
+  "0_69": {
+    "ego_id": "0",
+    "actor_id": "69",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 10:17:11"
+  },
+  "0_68": {
+    "ego_id": "0",
+    "actor_id": "68",
+    "min_frame": "0",
+    "max_frame": "172",
+    "label_idx": 0,
+    "timestamp": "2026-01-21 10:17:14"
+  },
+  "2_79": {
+    "ego_id": "2",
+    "actor_id": "79",
+    "min_frame": "963",
+    "max_frame": "1346",
+    "label_idx": 3,
+    "timestamp": "2026-01-21 10:18:02"
+  }
+}

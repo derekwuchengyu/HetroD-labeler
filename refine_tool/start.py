@@ -8,6 +8,10 @@ def main():
                         choices=['default', 'ipad'], 
                         default='default',
                         help='Choose UI layout: default or ipad')
+    parser.add_argument('--data_id','-id',
+                        type=str,
+                        default='00',
+                        help='Specify the DATA_ID to use')
     
     args = parser.parse_args()
     
@@ -22,7 +26,7 @@ def main():
     
     # 建立主視窗，傳入對應的 UI 類別
     from controller import MainWindow_controller
-    window = MainWindow_controller(Ui_MainWindow)
+    window = MainWindow_controller(Ui_MainWindow, DATA_ID=args.data_id)
     window.show()
 
     sys.exit(app.exec())

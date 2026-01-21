@@ -6,6 +6,7 @@ import orjson
 import pickle
 import os
 from datetime import datetime
+import pandas as pd  # 新增
 
 
 
@@ -13,7 +14,7 @@ class MainWindow_controller(QMainWindow):
     # 檔案快取
     _file_cache = {}
     
-    def __init__(self, ui_class):
+    def __init__(self, ui_class, DATA_ID='01'):
         super().__init__() 
         self.ui = ui_class()  # 使用傳入的 UI 類別
         self.ui.setupUi(self)
@@ -27,16 +28,28 @@ class MainWindow_controller(QMainWindow):
 
 
         self.data_path = "../data"
+        self.DATA_ID = DATA_ID
         
-
+        print(f"Loading track #{self.DATA_ID} data...")
         # we load the dict for ego id and object id list
-        with open(f'{self.data_path}/trackid_objects.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_trackid_objects.json', 'r', encoding='utf-8') as f:
             self.id_list = orjson.loads(f.read())
         # load pet and min distance dictory 
-        with open(f'{self.data_path}/pet_distance_dict.json', 'r', encoding='utf-8') as f:
-            self.pet_min_distance_dict = orjson.loads(f.read())
+        # with open(f'{self.data_path}/{self.DATA_ID}_pet_distance_dict.json', 'r', encoding='utf-8') as f:
+        #     self.pet_min_distance_dict = orjson.loads(f.read())
+        # --- 改為從 parquet 讀取 ---
+        
+        parquet_path = os.path.join(self.data_path, f"{self.DATA_ID}_pet_collisions.parquet")
+        pet_df = pd.read_parquet(parquet_path)
+        self.pet_min_distance_dict = {}
+        for row in pet_df.itertuples(index=False):
+            k1 = f"{row.track_id1}_{row.track_id2}"
+            k2 = f"{row.track_id2}_{row.track_id1}"
+            self.pet_min_distance_dict[k1] = {"pet": row.pet, "min_distance": row.min_distance}
+            self.pet_min_distance_dict[k2] = {"pet": -row.pet, "min_distance": row.min_distance}
+        # --- end parquet ---
 
-        with open(f'{self.data_path}/trackid_class.json', 'r', encoding='utf-8') as f:
+        with open(f'{self.data_path}/{self.DATA_ID}_trackid_class.json', 'r', encoding='utf-8') as f:
             self.trackid_class = orjson.loads(f.read())
 
         ego_id_list = list(self.id_list.keys())
@@ -52,7 +65,8 @@ class MainWindow_controller(QMainWindow):
         for actor_id in other_actor_id:
             self.ui.comboBox_other_actor_id.addItem(str(actor_id))
         
-        self.video_controller = video_controller(data_path=self.data_path, ui=self.ui)
+        print("Initializing video controller...")
+        self.video_controller = video_controller(data_path=self.data_path, ui=self.ui, DATA_ID=self.DATA_ID)
 
         
         self.update_current_pet_min_distance_dict()
@@ -110,7 +124,7 @@ class MainWindow_controller(QMainWindow):
         
         # 設定 doubleSpinBox 數值
         self.ui.doubleSpinBox_pet_min.setValue(-15)
-        self.ui.doubleSpinBox_pet_max.setValue(10)
+        self.ui.doubleSpinBox_pet_max.setValue(15)
         self.ui.doubleSpinBox_distance_max.setValue(5)
         
         # 設定 checkBox 為 True
@@ -132,7 +146,7 @@ class MainWindow_controller(QMainWindow):
         all_ego_id_list = list(self.id_list.keys())
 
         # 讀取已完成的 ego_id
-        save_path = os.path.join(self.data_path, "ego_done.json")
+        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_ego_done.json")
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
                 try:
@@ -191,6 +205,8 @@ class MainWindow_controller(QMainWindow):
         ego_id = self.ui.comboBox_ego_id.currentText()
         actor_id_list = self.id_list[ego_id]
 
+        print("Filtered actor ID")
+
         # 兩個條件都沒選直接 return
         if not use_pet and not use_distance:
             # 如果目前 combobox 內容和 actor_id_list 不一樣才重設
@@ -209,6 +225,7 @@ class MainWindow_controller(QMainWindow):
         # 檢查 spinbox 的值是否在範圍內
         min_dist_min, min_dist_max = self.min_distance_range if self.min_distance_range else (None, None)
         pet_range_min, pet_range_max = self.pet_range if self.pet_range else (None, None)
+        print(" list by range:pet({} ~ {}), distance({} ~ {})".format(pet_min, pet_max, dist_min, dist_max))
 
         if use_pet and pet_range_min is not None and pet_min < pet_range_min:
             pet_min = pet_range_min
@@ -230,23 +247,20 @@ class MainWindow_controller(QMainWindow):
                 continue
             pet = info.get("pet", None)
             min_distance = info.get("min_distance", None)
-            pet_val = float('inf') if pet == 1000000 else pet
+            # pet_val = float('inf') if pet == 1000000 else pet
 
             # 條件判斷
             pet_ok = False
             dist_ok = False
             if use_pet:
-                
-                pet_ok = pet_val is not None and pet_min <= pet_val <= pet_max
+                pet_ok = pet is not None and pet_min - 0.01 <= pet <= pet_max + 0.01
             if use_distance:
-                dist_ok = min_distance is not None and dist_min <= min_distance <= dist_max
+                dist_ok = min_distance is not None and dist_min - 0.01 <= min_distance <= dist_max  + 0.01
 
             # 只要有一個條件符合就納入
             if pet_ok or dist_ok:
                 filtered_list.append(actor_id)
-
-
-                # print(pet_val, pet_min, pet_max)
+            
 
         # 依 min_distance 排序
         def get_min_distance(actor_id):
@@ -264,6 +278,8 @@ class MainWindow_controller(QMainWindow):
         self.ui.comboBox_other_actor_id.clear()
         for actor_id in sorted_filtered_list:
             self.ui.comboBox_other_actor_id.addItem(str(actor_id))
+
+        print("Filtered actor ID list by range:", pet_min, pet_max, dist_min, dist_max)
         self.update_combobox_label_info()
 
     def confirm_remove_ego_id(self):
@@ -280,7 +296,7 @@ class MainWindow_controller(QMainWindow):
             print("已確認移除 Ego ID", self.ui.comboBox_ego_id.currentText())
 
             # remove ego id from file and from combobox and select next ego id
-            with open(f'{self.data_path}/trackid_objects.json', 'r', encoding='utf-8') as f:
+            with open(f'{self.data_path}/{self.DATA_ID}_trackid_objects.json', 'r', encoding='utf-8') as f:
                 self.id_list = orjson.loads(f.read())
             
             current_index = self.ui.comboBox_ego_id.currentIndex()
@@ -292,7 +308,7 @@ class MainWindow_controller(QMainWindow):
             if current_ego_id in self.id_list:
                 del self.id_list[current_ego_id]
                 # 寫回檔案
-                with open(f'{self.data_path}/trackid_objects.json', 'w', encoding='utf-8') as f:
+                with open(f'{self.data_path}/{self.DATA_ID}_trackid_objects.json', 'w', encoding='utf-8') as f:
                     orjson.dumps(self.id_list, f, ensure_ascii=False)
 
                 # 更新 combobox
@@ -393,7 +409,7 @@ class MainWindow_controller(QMainWindow):
 
         # 只顯示未標註過的
         if self.show_only_unlabeled:
-            save_path = os.path.join(self.data_path, "labeled_scenarios.json")
+            save_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
             if os.path.exists(save_path):
                 with open(save_path, "r", encoding="utf-8") as f:
                     try:
@@ -531,7 +547,7 @@ class MainWindow_controller(QMainWindow):
         key = f"{ego_id}_{actor_id}"
 
         # 讀取已標註 scenario
-        save_path = os.path.join(self.data_path, "labeled_scenarios.json")
+        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
         selected_label_idx = None
         if os.path.exists(save_path):
             with open(save_path, "r", encoding="utf-8") as f:
@@ -545,7 +561,7 @@ class MainWindow_controller(QMainWindow):
         self.selected_label_idx = selected_label_idx
 
         # 讀取 label 99 標記
-        complex_path = os.path.join(self.data_path, "complex_scenarios.json")
+        complex_path = os.path.join(self.data_path, f"{self.DATA_ID}_complex_scenarios.json")
         self.selected_label_idx_99 = False
         if os.path.exists(complex_path):
             with open(complex_path, "r", encoding="utf-8") as f:
@@ -557,7 +573,7 @@ class MainWindow_controller(QMainWindow):
                     pass
 
         # 讀取特別scenario標記
-        special_path = os.path.join(self.data_path, "special_scenarios.json")
+        special_path = os.path.join(self.data_path, f"{self.DATA_ID}_special_scenarios.json")
         self.selected_special_scenario = False
         if os.path.exists(special_path):
             with open(special_path, "r", encoding="utf-8") as f:
@@ -660,9 +676,9 @@ class MainWindow_controller(QMainWindow):
                 if i == self.selected_label_idx:
                     btn.setStyleSheet("color: red;")
                 elif i in blue_labels:
-                    btn.setStyleSheet("color: white;")
-                else:
                     btn.setStyleSheet("color: gray;")
+                else:
+                    btn.setStyleSheet("color: white;")
             except AttributeError:
                 continue
 
@@ -684,13 +700,13 @@ class MainWindow_controller(QMainWindow):
         }
 
         # 5. 儲存至主檔案 (labeled_scenarios.json)
-        self._save_to_json("labeled_scenarios.json", key, scenario_data)
+        self._save_to_json(f"{self.DATA_ID}_labeled_scenarios.json", key, scenario_data)
 
         # 6. 處理 label 99 的獨立存檔 (complex_scenarios.json)
         if self.selected_label_idx_99:
-            self._save_to_json("complex_scenarios.json", key, scenario_data)
+            self._save_to_json(f"{self.DATA_ID}_complex_scenarios.json", key, scenario_data)
         else:
-            self._remove_from_json("complex_scenarios.json", key)
+            self._remove_from_json(f"{self.DATA_ID}_complex_scenarios.json", key)
 
         # 7. 更新按鈕顏色
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
@@ -719,12 +735,23 @@ class MainWindow_controller(QMainWindow):
 
         # 根據狀態新增或刪除
         if self.selected_special_scenario:
-            self._save_to_json("special_scenarios.json", key, scenario_data)
+            self._save_to_json(f"{self.DATA_ID}_special_scenarios.json", key, scenario_data)
         else:
-            self._remove_from_json("special_scenarios.json", key)
+            self._remove_from_json(f"{self.DATA_ID}_special_scenarios.json", key)
 
         # 更新按鈕顏色
         self.ui.pushButton_special_scenario.setStyleSheet("color: red;" if self.selected_special_scenario else "color: black;")
+    def _load_json_file(self, path):
+        """通用讀取輔助函式"""
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                try:
+                    content = orjson.loads(f.read())
+                except Exception:
+                    content = {}
+        else:
+            content = {}
+        return content
 
     def _save_to_json(self, file_name, key, data):
         """通用儲存輔助函式"""
@@ -756,7 +783,7 @@ class MainWindow_controller(QMainWindow):
         if reply != QMessageBox.StandardButton.Yes:
             return
 
-        save_path = os.path.join(self.data_path, "ego_done.json")
+        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_ego_done.json")
         ego_done_list = self._load_json_file(save_path)
 
         if ego_id not in ego_done_list:
@@ -765,4 +792,9 @@ class MainWindow_controller(QMainWindow):
             print(f"已標記 ego_id {ego_id} 為已完成")
         else:
             print(f"ego_id {ego_id} 已經標記過")
+
+    def _save_json_file(self, path, content):
+        """將 dict 內容存成 JSON 檔案（utf-8, pretty, 支援中文）"""
+        with open(path, "wb") as f:
+            f.write(orjson.dumps(content, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
 
