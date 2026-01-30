@@ -29,7 +29,11 @@ class MainWindow_controller(QMainWindow):
 
         self.data_path = "../data"
         self.DATA_ID = DATA_ID
-        self.label_num = 2
+        self.label_max = 15
+
+        self.motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
+        self.car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
+        self.ped_labels = [0, 11, 12, 88]
         
         print(f"Loading track #{self.DATA_ID} data...")
         # we load the dict for ego id and object id list
@@ -93,7 +97,7 @@ class MainWindow_controller(QMainWindow):
 
 
         # 設定 label 按鈕點擊事件
-        for i in list(range(0, self.label_num+1))+[88]:
+        for i in list(range(0, self.label_max+1))+[88]:
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
@@ -593,19 +597,17 @@ class MainWindow_controller(QMainWindow):
                     pass
 
         # 設定按鈕顏色
-        car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
-        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
-        ped_labels = [0, 11, 12, 88]
         cls = self.trackid_class.get(str(actor_id), "unknown").lower()
+        print(cls, self.trackid_class, actor_id)
         blue_labels = set()
         if cls in ["car", "truck"]:
-            blue_labels = set(car_truck_labels)
+            blue_labels = set(self.car_truck_labels)
         elif cls in ["motorcycle", "bicycle"]:
-            blue_labels = set(motor_bike_labels)
+            blue_labels = set(self.motor_bike_labels)
         elif cls == "pedestrian":
-            blue_labels = set(ped_labels)
+            blue_labels = set(self.ped_labels)
 
-        for i in list(range(0, self.label_num+1))+[88]:
+        for i in list(range(0, self.label_max+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -658,12 +660,12 @@ class MainWindow_controller(QMainWindow):
         # 1. 取得當前 Actor 的合法標籤範圍
         other_actor_id = self.ui.comboBox_other_actor_id.currentText()
         cls = self.trackid_class.get(str(other_actor_id), "unknown").lower()
-        valid_indices = {0, 1, 2, 6, 7, 8, 88, 99}
+        valid_indices = set(self.car_truck_labels + [99])  # Default for car/truck
         if cls in ["motorcycle", "bicycle"]:
-            valid_indices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 88, 99}
+            valid_indices = set(self.motor_bike_labels + [99])
         elif cls == "pedestrian":
-            valid_indices = {0, 11, 12, 88, 99}
-
+            valid_indices = set(self.ped_labels + [99])
+            
         if selected_idx not in valid_indices:
             return
 
@@ -678,7 +680,7 @@ class MainWindow_controller(QMainWindow):
 
         # 3. 更新 UI 按鈕顏色
         blue_labels = valid_indices - {99}
-        for i in list(range(0, self.label_num + 1)) + [88]:
+        for i in list(range(0, self.label_max + 1)) + [88]:
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 if i == self.selected_label_idx:

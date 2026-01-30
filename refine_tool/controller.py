@@ -18,7 +18,11 @@ class MainWindow_controller(QMainWindow):
 
         # 設定要篩選的 label_idx 值
         LABEL_IDX = 88
-        self.label_num = 15
+        self.label_max = 2
+
+        self.motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
+        self.car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
+        self.ped_labels = [0, 11, 12, 88]
 
         # 根據 UI 模組決定 ToolTip 字體大小
         
@@ -97,7 +101,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
         # 設定 label 按鈕點擊事件
-        for i in list(range(0, self.label_num+1))+[88]:
+        for i in list(range(0, self.label_max+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
         
@@ -203,19 +207,16 @@ class MainWindow_controller(QMainWindow):
                     pass
 
         # 設定按鈕顏色
-        car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
-        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
-        ped_labels = [0, 11, 12, 88]
         cls = self.trackid_class.get(str(other_actor_id), "unknown").lower()
         blue_labels = set()
         if cls in ["car", "truck"]:
-            blue_labels = set(car_truck_labels)
+            blue_labels = set(self.car_truck_labels)
         elif cls in ["motorcycle", "bicycle"]:
-            blue_labels = set(motor_bike_labels)
+            blue_labels = set(self.motor_bike_labels)
         elif cls == "pedestrian":
-            blue_labels = set(ped_labels)
+            blue_labels = set(self.ped_labels)
 
-        for i in range(0, self.label_num + 1):
+        for i in range(0, self.label_max + 1):
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -318,16 +319,13 @@ class MainWindow_controller(QMainWindow):
         # 取得目前 class
         other_actor_class = actor_id
         other_actor_class = self.trackid_class.get(str(other_actor_class), "unknown").lower()
-        car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
-        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 88]
-        ped_labels = [0, 11, 12, 13, 14, 88]
         blue_labels = set()
         if other_actor_class in ["car", "truck"]:
-            blue_labels = set(car_truck_labels)
+            blue_labels = set(self.car_truck_labels)
         elif other_actor_class in ["motorcycle", "bicycle"]:
-            blue_labels = set(motor_bike_labels)
+            blue_labels = set(self.motor_bike_labels)
         elif other_actor_class == "pedestrian":
-            blue_labels = set(ped_labels)
+            blue_labels = set(self.ped_labels)
 
         # 加入 label=99 到所有合法範圍
         valid_indices = blue_labels | {99}
@@ -347,7 +345,7 @@ class MainWindow_controller(QMainWindow):
             # self.selected_label_idx_99 = False  # 重置 99 flag
 
         # 更新 UI 按鈕顏色
-        for i in list(range(0, self.label_num+1))+[88]:
+        for i in list(range(0, self.label_max+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
