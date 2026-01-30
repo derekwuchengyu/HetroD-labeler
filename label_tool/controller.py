@@ -219,7 +219,7 @@ class MainWindow_controller(QMainWindow):
         # 兩個條件都沒選直接 return
         if not use_pet and not use_distance:
             # 如果目前 combobox 內容和 actor_id_list 不一樣才重設
-            if self.ui.comboBox_other_actor_id.count() != len(a--(actor_id))
+            if self.ui.comboBox_other_actor_id.count() != len(actor_id_list):
                 self.update_combobox_label_info()
             return []
 
