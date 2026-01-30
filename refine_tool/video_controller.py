@@ -1,7 +1,7 @@
 from PyQt6 import QtCore 
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import QTimer, Qt
-from PyQt6.QtWidgets import QSlider
+from PyQt6.QtWidgets import QSlider, QPushButton
 import numpy as np
 import cv2 
 import orjson
@@ -38,6 +38,12 @@ def draw_rotated_bbox(img, x, y, width, length, heading, color=(0,255,0), thickn
 ortho_px_to_meter = 0.0499967249445942
 
 
+class DoubleClickButton(QPushButton):
+    doubleClicked = QtCore.pyqtSignal()
+    def mouseDoubleClickEvent(self, event):
+        self.doubleClicked.emit()
+        super().mouseDoubleClickEvent(event)
+
 class video_controller(object):
     def __init__(self, data_path,  ui, DATA_ID):
         self.data_path = data_path
@@ -50,7 +56,7 @@ class video_controller(object):
 
         # 設定速度選單
         self.speed_map = {
-            "6": 6,    
+            "10": 10,
             "5": 5,    
             "4": 4,     
             "3": 3,    
@@ -120,7 +126,18 @@ class video_controller(object):
 
         self.route_index = 0
 
+        # Replace pushButton_play_or_stop with DoubleClickButton if not already
+        orig_btn = self.ui.pushButton_play_or_stop
+        parent = orig_btn.parent()
+        geometry = orig_btn.geometry()
+        orig_btn.hide()
+        self.ui.pushButton_play_or_stop = DoubleClickButton(parent)
+        self.ui.pushButton_play_or_stop.setGeometry(geometry)
+        self.ui.pushButton_play_or_stop.setText(orig_btn.text())
+        self.ui.pushButton_play_or_stop.show()
+
         self.ui.pushButton_play_or_stop.clicked.connect(self.toggle_play_or_stop)
+        self.ui.pushButton_play_or_stop.doubleClicked.connect(self.on_play_or_stop_double_clicked)
         self.update_play_or_stop_button_text()
         
         self.ui.pushButton_show_object_location.clicked.connect(self.toggle_show_object_location)
@@ -190,6 +207,19 @@ class video_controller(object):
         # 擴大範圍
         min_target = min_overlay - offset  if min_overlay - offset >= 0 else 0
         max_target = max_overlay + offset
+
+        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_ego_frame_range.json")
+        if os.path.exists(save_path):
+            with open(save_path, "r", encoding="utf-8") as f:
+                try:
+                    content = orjson.loads(f.read())
+                except Exception:
+                    content = {}
+            if id_pair in content:
+                print(f"Loaded ego frame range for {id_pair}: {content[id_pair]}")
+                min_target = content[id_pair].get("min_frame", min_target)
+                max_target = content[id_pair].get("max_frame", max_target)
+
         # 取得 ego id frame list 在這個範圍內的 frame
         self.overlay_frame_list = [
             f for f in sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
@@ -271,7 +301,22 @@ class video_controller(object):
         bytesPerline = 3 * self.image_width
         
         frame = self.__update_label_onscreen(frame)
+
+        min_frame_idx = self.ui.slider_videoframe.value()
+        self.abs_frame_no = int(self.overlay_frame_list[min_frame_idx])
         
+        # 顯示當前 frame 編號於左上角
+        cv2.putText(
+            frame,
+            f"Frame: {self.abs_frame_no + 1}",
+            (10, 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (255, 255, 255),
+            2,
+            cv2.LINE_AA
+        )
+
         qimg = QImage(frame, self.image_width, self.image_height, bytesPerline, QImage.Format.Format_RGB888).rgbSwapped()
         self.qpixmap = QPixmap.fromImage(qimg)
         
@@ -336,9 +381,9 @@ class video_controller(object):
    
     def play(self):
         self.videoplayer_state = "play"
-        self.current_frame_no = 0
+        # self.current_frame_no = 0
         # print(self.current_speed_interval)
-        self.timer.start(30)
+        self.timer.start(self.current_speed_interval)
         self.update_play_or_stop_button_text()
 
     def stop(self):
@@ -352,6 +397,12 @@ class video_controller(object):
             self.stop()
         else:
             self.play()
+
+    def on_play_or_stop_double_clicked(self):
+        # 雙擊時重置到第一幀並播放
+        self.current_frame_no = 0
+        self.setslidervalue(0)
+        self.play()
 
     def on_range_slider_changed(self, value):
         min_frame, max_frame = value

@@ -7,7 +7,7 @@ import pickle
 import os
 from datetime import datetime
 import pandas as pd  # 新增
-
+# python -m PyQt6.uic.pyuic label.ui -o UI.py
 
 
 class MainWindow_controller(QMainWindow):
@@ -29,6 +29,7 @@ class MainWindow_controller(QMainWindow):
 
         self.data_path = "../data"
         self.DATA_ID = DATA_ID
+        self.label_num = 2
         
         print(f"Loading track #{self.DATA_ID} data...")
         # we load the dict for ego id and object id list
@@ -37,9 +38,8 @@ class MainWindow_controller(QMainWindow):
         # load pet and min distance dictory 
         # with open(f'{self.data_path}/{self.DATA_ID}_pet_distance_dict.json', 'r', encoding='utf-8') as f:
         #     self.pet_min_distance_dict = orjson.loads(f.read())
-        # --- 改為從 parquet 讀取 ---
         
-        # parquet_path = os.path.join(self.data_path, f"{self.DATA_ID}_pet_collisions.parquet")
+        # --- 改為從 parquet 讀取 ---
         parquet_path = os.path.join(self.data_path, f"{self.DATA_ID}_pet_optimized.parquet")
         pet_df = pd.read_parquet(parquet_path)
         self.pet_min_distance_dict = {}
@@ -93,9 +93,12 @@ class MainWindow_controller(QMainWindow):
 
 
         # 設定 label 按鈕點擊事件
-        for i in range(0, 14):
-            btn = getattr(self.ui, f"pushButton_label_{i}")
-            btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
+        for i in list(range(0, self.label_num+1))+[88]:
+            try:
+                btn = getattr(self.ui, f"pushButton_label_{i}")
+                btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
+            except AttributeError:
+                print(f"Warning: pushButton_label_{i} not found in UI.")
 
         # 加入 label=99 按鈕（多種scenario）
         self.ui.pushButton_label_99.clicked.connect(lambda checked: self.set_label_button_selected(99))
@@ -188,9 +191,9 @@ class MainWindow_controller(QMainWindow):
     def set_label_tooltips(self, enable=True):
         self.ui.pushButton_label_1.setToolTip("ego 路口直行，遇到對向左轉 \n{Car, Truck, Motor/Bike}" if enable else "")
         self.ui.pushButton_label_2.setToolTip("ego 路口左轉，遇到對向直行 \n{Car, Truck, Motor/Bike}" if enable else "")
-        self.ui.pushButton_label_3.setToolTip("ego 與機踏車並行，機踏車加速通過" if enable else "")
-        self.ui.pushButton_label_4.setToolTip("ego 與機踏車並行，機踏車等速並行" if enable else "")
-        self.ui.pushButton_label_5.setToolTip("ego 與機踏車並行，機踏車減速" if enable else "")
+        self.ui.pushButton_label_3.setToolTip("ego 與機踏車同車道並行，機踏車自側後方加速超越" if enable else "")
+        self.ui.pushButton_label_4.setToolTip("ego 與機踏車同車道並行，機踏車等速並行" if enable else "")
+        self.ui.pushButton_label_5.setToolTip("ego 與機踏車同車道並行，機踏車自側前方減速被ego超越" if enable else "")
         self.ui.pushButton_label_6.setToolTip("ego 前方同車道有停止車（等左轉/臨停）\n，ego 通過前未移動即算，需換道 (含佔用一點車道情況)，例：338,913,1096,1997" if enable else "")
         self.ui.pushButton_label_7.setToolTip("前方 {Car, Truck, Motor/Bike} 從右側 cut-in" if enable else "")
         self.ui.pushButton_label_8.setToolTip("前方 {Car, Truck, Motor/Bike} 從左側 cut-in" if enable else "")
@@ -198,6 +201,9 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_10.setToolTip("ego 左轉，對向機踏車準備待轉" if enable else "")
         self.ui.pushButton_label_11.setToolTip("ego 右轉後遇見行人通過" if enable else "")
         self.ui.pushButton_label_12.setToolTip("ego 左轉後遇見行人通過" if enable else "")
+        self.ui.pushButton_label_13.setToolTip("ego 向右切車道遇到右側直行汽機車" if enable else "")
+        self.ui.pushButton_label_14.setToolTip("ego 向左切車道遇到左側直行汽機車" if enable else "")
+        self.ui.pushButton_label_15.setToolTip("ego 左轉遇到左側機踏車通過" if enable else "")
         
 
     def filter_actor_id_list(self):
@@ -213,10 +219,7 @@ class MainWindow_controller(QMainWindow):
         # 兩個條件都沒選直接 return
         if not use_pet and not use_distance:
             # 如果目前 combobox 內容和 actor_id_list 不一樣才重設
-            if self.ui.comboBox_other_actor_id.count() != len(actor_id_list):
-                self.ui.comboBox_other_actor_id.clear()
-                for actor_id in actor_id_list:
-                    self.ui.comboBox_other_actor_id.addItem(str(actor_id))
+            if self.ui.comboBox_other_actor_id.count() != len(a--(actor_id))
                 self.update_combobox_label_info()
             return []
 
@@ -590,9 +593,9 @@ class MainWindow_controller(QMainWindow):
                     pass
 
         # 設定按鈕顏色
-        car_truck_labels = [0, 1, 2, 6, 7, 8, 13]
-        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13]
-        ped_labels = [0, 11, 12, 13]
+        car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
+        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
+        ped_labels = [0, 11, 12, 88]
         cls = self.trackid_class.get(str(actor_id), "unknown").lower()
         blue_labels = set()
         if cls in ["car", "truck"]:
@@ -602,7 +605,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(ped_labels)
 
-        for i in range(0, 14):
+        for i in list(range(0, self.label_num+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -655,11 +658,11 @@ class MainWindow_controller(QMainWindow):
         # 1. 取得當前 Actor 的合法標籤範圍
         other_actor_id = self.ui.comboBox_other_actor_id.currentText()
         cls = self.trackid_class.get(str(other_actor_id), "unknown").lower()
-        valid_indices = {0, 1, 2, 6, 7, 8, 13, 99}
+        valid_indices = {0, 1, 2, 6, 7, 8, 88, 99}
         if cls in ["motorcycle", "bicycle"]:
-            valid_indices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 99}
+            valid_indices = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 88, 99}
         elif cls == "pedestrian":
-            valid_indices = {0, 11, 12, 13, 99}
+            valid_indices = {0, 11, 12, 88, 99}
 
         if selected_idx not in valid_indices:
             return
@@ -675,7 +678,7 @@ class MainWindow_controller(QMainWindow):
 
         # 3. 更新 UI 按鈕顏色
         blue_labels = valid_indices - {99}
-        for i in range(0, 14):
+        for i in list(range(0, self.label_num + 1)) + [88]:
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 if i == self.selected_label_idx:

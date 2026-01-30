@@ -1,1 +1,416 @@
-{}
+{
+  "14_192": {
+    "ego_id": "14",
+    "actor_id": "192",
+    "min_frame": "2277",
+    "max_frame": "2906",
+    "label_idx": 3
+  },
+  "31_192": {
+    "ego_id": "31",
+    "actor_id": "192",
+    "min_frame": "2317",
+    "max_frame": "2865",
+    "label_idx": 3
+  },
+  "257_447": {
+    "ego_id": "257",
+    "actor_id": "447",
+    "min_frame": "6845",
+    "max_frame": "7332",
+    "label_idx": 4
+  },
+  "367_364": {
+    "ego_id": "367",
+    "actor_id": "364",
+    "min_frame": "5373",
+    "max_frame": "5520",
+    "label_idx": 3
+  },
+  "421_427": {
+    "ego_id": "421",
+    "actor_id": "427",
+    "min_frame": "8335",
+    "max_frame": "8730",
+    "label_idx": 3
+  },
+  "632_628": {
+    "ego_id": "632",
+    "actor_id": "628",
+    "min_frame": "11144",
+    "max_frame": "11591",
+    "label_idx": 3
+  },
+  "827_844": {
+    "ego_id": "827",
+    "actor_id": "844",
+    "min_frame": "14225",
+    "max_frame": "14398",
+    "label_idx": 3
+  },
+  "1249_1250": {
+    "ego_id": "1249",
+    "actor_id": "1250",
+    "min_frame": "22182",
+    "max_frame": "22415",
+    "label_idx": 3
+  },
+  "1261_1260": {
+    "ego_id": "1261",
+    "actor_id": "1260",
+    "min_frame": "22287",
+    "max_frame": "22531",
+    "label_idx": 3
+  },
+  "1290_1276": {
+    "ego_id": "1290",
+    "actor_id": "1276",
+    "min_frame": "24998",
+    "max_frame": "25235",
+    "label_idx": 3
+  },
+  "407_530": {
+    "ego_id": "407",
+    "actor_id": "530",
+    "min_frame": "8823",
+    "max_frame": "9721",
+    "label_idx": 10
+  },
+  "557_530": {
+    "ego_id": "557",
+    "actor_id": "530",
+    "min_frame": "8983",
+    "max_frame": "9956",
+    "label_idx": 10
+  },
+  "586_530": {
+    "ego_id": "586",
+    "actor_id": "530",
+    "min_frame": "9545",
+    "max_frame": "9969",
+    "label_idx": 10
+  },
+  "1410_1424": {
+    "ego_id": "1410",
+    "actor_id": "1424",
+    "min_frame": "25464",
+    "max_frame": "25645",
+    "label_idx": 3
+  },
+  "1525_1545": {
+    "ego_id": "1525",
+    "actor_id": "1545",
+    "min_frame": "27457",
+    "max_frame": "27958",
+    "label_idx": 3
+  },
+  "1536_1550": {
+    "ego_id": "1536",
+    "actor_id": "1550",
+    "min_frame": "27540",
+    "max_frame": "28079",
+    "label_idx": 3
+  },
+  "1536_1549": {
+    "ego_id": "1536",
+    "actor_id": "1549",
+    "min_frame": "27388",
+    "max_frame": "27566",
+    "label_idx": 14
+  },
+  "1538_1562": {
+    "ego_id": "1538",
+    "actor_id": "1562",
+    "min_frame": "27583",
+    "max_frame": "27961",
+    "label_idx": 3
+  },
+  "1538_1550": {
+    "ego_id": "1538",
+    "actor_id": "1550",
+    "min_frame": "27324",
+    "max_frame": "27675",
+    "label_idx": 3
+  },
+  "1542_1545": {
+    "ego_id": "1542",
+    "actor_id": "1545",
+    "min_frame": "27374",
+    "max_frame": "27626",
+    "label_idx": 3
+  },
+  "1580_1591": {
+    "ego_id": "1580",
+    "actor_id": "1591",
+    "min_frame": "29696",
+    "max_frame": "30258",
+    "label_idx": 3
+  },
+  "1725_1727": {
+    "ego_id": "1725",
+    "actor_id": "1727",
+    "min_frame": 29994,
+    "max_frame": 30455,
+    "label_idx": 7
+  },
+  "1740_1746": {
+    "ego_id": "1740",
+    "actor_id": "1746",
+    "min_frame": 30465,
+    "max_frame": 30604,
+    "label_idx": 3
+  },
+  "1740_1748": {
+    "ego_id": "1740",
+    "actor_id": "1748",
+    "min_frame": 30598,
+    "max_frame": 30720,
+    "label_idx": 3
+  },
+  "1786_1797": {
+    "ego_id": "1786",
+    "actor_id": "1797",
+    "min_frame": "31364",
+    "max_frame": "32210",
+    "label_idx": 0,
+    "timestamp": "2026-01-25 22:25:37"
+  },
+  "215_179": {
+    "ego_id": "215",
+    "actor_id": "179",
+    "min_frame": "3049",
+    "max_frame": "3404",
+    "label_idx": 5
+  },
+  "417_425": {
+    "ego_id": "417",
+    "actor_id": "425",
+    "min_frame": "8380",
+    "max_frame": "8841",
+    "label_idx": 4
+  },
+  "1480_1650": {
+    "ego_id": "1480",
+    "actor_id": "1650",
+    "min_frame": "29260",
+    "max_frame": "29793",
+    "label_idx": 5
+  },
+  "1513_1521": {
+    "ego_id": "1513",
+    "actor_id": "1521",
+    "min_frame": "26730",
+    "max_frame": "27145",
+    "label_idx": 5
+  },
+  "1230_1153": {
+    "ego_id": "1230",
+    "actor_id": "1153",
+    "min_frame": "22379",
+    "max_frame": "22589",
+    "label_idx": 6
+  },
+  "1239_1153": {
+    "ego_id": "1239",
+    "actor_id": "1153",
+    "min_frame": "22350",
+    "max_frame": "22711",
+    "label_idx": 6
+  },
+  "1293_1290": {
+    "ego_id": "1293",
+    "actor_id": "1290",
+    "min_frame": "23494",
+    "max_frame": "23822",
+    "label_idx": 6
+  },
+  "1664_1657": {
+    "ego_id": "1664",
+    "actor_id": "1657",
+    "min_frame": "29989",
+    "max_frame": "30934",
+    "label_idx": 6
+  },
+  "1743_1491": {
+    "ego_id": "1743",
+    "actor_id": "1491",
+    "min_frame": "30604",
+    "max_frame": "30782",
+    "label_idx": 6
+  },
+  "1758_988": {
+    "ego_id": "1758",
+    "actor_id": "988",
+    "min_frame": "31544",
+    "max_frame": "31676",
+    "label_idx": 6
+  },
+  "1998_1963": {
+    "ego_id": "1998",
+    "actor_id": "1963",
+    "min_frame": "35932",
+    "max_frame": "36084",
+    "label_idx": 6
+  },
+  "211_179": {
+    "ego_id": "211",
+    "actor_id": "179",
+    "min_frame": "2893",
+    "max_frame": "3223",
+    "label_idx": 7
+  },
+  "2156_1988": {
+    "ego_id": "2156",
+    "actor_id": "1988",
+    "min_frame": "39008",
+    "max_frame": "39272",
+    "label_idx": 7
+  },
+  "1522_1579": {
+    "ego_id": "1522",
+    "actor_id": "1579",
+    "min_frame": "27713",
+    "max_frame": "27970",
+    "label_idx": 8
+  },
+  "1553_1579": {
+    "ego_id": "1553",
+    "actor_id": "1579",
+    "min_frame": "27745",
+    "max_frame": "27943",
+    "label_idx": 8
+  },
+  "39_187": {
+    "ego_id": "39",
+    "actor_id": "187",
+    "min_frame": "2243",
+    "max_frame": "3026",
+    "label_idx": 11
+  },
+  "561_649": {
+    "ego_id": "561",
+    "actor_id": "649",
+    "min_frame": "11156",
+    "max_frame": "11975",
+    "label_idx": 11
+  },
+  "940_933": {
+    "ego_id": "940",
+    "actor_id": "933",
+    "min_frame": "16140",
+    "max_frame": "16398",
+    "label_idx": 11
+  },
+  "1436_1441": {
+    "ego_id": "1436",
+    "actor_id": "1441",
+    "min_frame": "25282",
+    "max_frame": "25855",
+    "label_idx": 12
+  },
+  "557_505": {
+    "ego_id": "557",
+    "actor_id": "505",
+    "min_frame": "9283",
+    "max_frame": "9880",
+    "label_idx": 12
+  },
+  "658_781": {
+    "ego_id": "658",
+    "actor_id": "781",
+    "min_frame": "13347",
+    "max_frame": "13834",
+    "label_idx": 12
+  },
+  "778_816": {
+    "ego_id": "778",
+    "actor_id": "816",
+    "min_frame": "13756",
+    "max_frame": "14183",
+    "label_idx": 12
+  },
+  "1156_1199": {
+    "ego_id": "1156",
+    "actor_id": "1199",
+    "min_frame": "21955",
+    "max_frame": "22449",
+    "label_idx": 12
+  },
+  "1156_1173": {
+    "ego_id": "1156",
+    "actor_id": "1173",
+    "min_frame": "22232",
+    "max_frame": "22472",
+    "label_idx": 12
+  },
+  "1156_1194": {
+    "ego_id": "1156",
+    "actor_id": "1194",
+    "min_frame": "21832",
+    "max_frame": "22433",
+    "label_idx": 12
+  },
+  "1156_1232": {
+    "ego_id": "1156",
+    "actor_id": "1232",
+    "min_frame": "21884",
+    "max_frame": "22432",
+    "label_idx": 12
+  },
+  "1156_1246": {
+    "ego_id": "1156",
+    "actor_id": "1246",
+    "min_frame": "21857",
+    "max_frame": "22472",
+    "label_idx": 12
+  },
+  "1230_1194": {
+    "ego_id": "1230",
+    "actor_id": "1194",
+    "min_frame": "22076",
+    "max_frame": "22534",
+    "label_idx": 12
+  },
+  "1101_1112": {
+    "ego_id": "1101",
+    "actor_id": "1112",
+    "min_frame": "19439",
+    "max_frame": "19796",
+    "label_idx": 2
+  },
+  "1293_1336": {
+    "ego_id": "1293",
+    "actor_id": "1336",
+    "min_frame": "22920",
+    "max_frame": "23820",
+    "label_idx": 88
+  },
+  "1543_1513": {
+    "ego_id": "1543",
+    "actor_id": "1513",
+    "min_frame": "27626",
+    "max_frame": "28002",
+    "label_idx": 88
+  },
+  "1543_1545": {
+    "ego_id": "1543",
+    "actor_id": "1545",
+    "min_frame": "27561",
+    "max_frame": "28055",
+    "label_idx": 2
+  },
+  "1543_1533": {
+    "ego_id": "1543",
+    "actor_id": "1533",
+    "min_frame": "27631",
+    "max_frame": "28018",
+    "label_idx": 2
+  },
+  "1678_1580": {
+    "ego_id": "1678",
+    "actor_id": "1580",
+    "min_frame": "29237",
+    "max_frame": "30453",
+    "label_idx": 88
+  }
+}

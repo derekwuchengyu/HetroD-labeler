@@ -1,1 +1,119 @@
-{}
+{
+  "367_364": {
+    "id_pair": "367_364",
+    "min_frame": "5373",
+    "max_frame": "5849",
+    "label_idx": 9,
+    "timestamp": "2026-01-22 20:41:29"
+  },
+  "632_628": {
+    "ego_id": "632",
+    "actor_id": "628",
+    "min_frame": "11144",
+    "max_frame": "11530",
+    "label_idx": 8,
+    "timestamp": "2026-01-27 16:13:06"
+  },
+  "926_945": {
+    "id_pair": "926_945",
+    "min_frame": "16062",
+    "max_frame": "16326",
+    "label_idx": 7,
+    "timestamp": "2026-01-22 22:48:21"
+  },
+  "1290_1276": {
+    "ego_id": "1290",
+    "actor_id": "1276",
+    "min_frame": "24816",
+    "max_frame": "25235",
+    "label_idx": 14,
+    "timestamp": "2026-01-27 14:33:18"
+  },
+  "1525_1549": {
+    "ego_id": "1525",
+    "actor_id": "1549",
+    "min_frame": "27495",
+    "max_frame": "28001",
+    "label_idx": 8,
+    "timestamp": "2026-01-27 16:19:03"
+  },
+  "1525_1545": {
+    "ego_id": "1525",
+    "actor_id": "1545",
+    "min_frame": "27457",
+    "max_frame": "28055",
+    "label_idx": 8,
+    "timestamp": "2026-01-27 16:18:45"
+  },
+  "1525_1550": {
+    "id_pair": "1525_1550",
+    "min_frame": "27897",
+    "max_frame": "28124",
+    "label_idx": 7,
+    "timestamp": "2026-01-25 20:48:00"
+  },
+  "1725_1727": {
+    "id_pair": "1725_1727",
+    "min_frame": 30418,
+    "max_frame": 30602,
+    "label_idx": 7,
+    "timestamp": "2026-01-25 21:50:50"
+  },
+  "1725_1728": {
+    "id_pair": "1725_1728",
+    "min_frame": 30066,
+    "max_frame": 30265,
+    "label_idx": 3,
+    "timestamp": "2026-01-25 22:04:48"
+  },
+  "1766_1771": {
+    "ego_id": "1766",
+    "actor_id": "1771",
+    "min_frame": "31034",
+    "max_frame": "31220",
+    "label_idx": 7,
+    "timestamp": "2026-01-27 13:01:52"
+  },
+  "1786_1794": {
+    "id_pair": "1786_1794",
+    "min_frame": 32000,
+    "max_frame": 32141,
+    "label_idx": 7,
+    "timestamp": "2026-01-25 22:17:48"
+  },
+  "2168_2169": {
+    "id_pair": "2168_2169",
+    "min_frame": 39047,
+    "max_frame": 39467,
+    "label_idx": 8,
+    "timestamp": "2026-01-25 22:52:10"
+  },
+  "306_308": {
+    "id_pair": "306_308",
+    "min_frame": "4528",
+    "max_frame": "4899",
+    "label_idx": 13,
+    "timestamp": "2026-01-25 23:13:22"
+  },
+  "836_854": {
+    "id_pair": "836_854",
+    "min_frame": "14259",
+    "max_frame": "14987",
+    "label_idx": 4,
+    "timestamp": "2026-01-25 23:19:30"
+  },
+  "417_423": {
+    "id_pair": "417_423",
+    "min_frame": "8353",
+    "max_frame": "8843",
+    "label_idx": 8,
+    "timestamp": "2026-01-26 15:26:47"
+  },
+  "1513_1521": {
+    "id_pair": "1513_1521",
+    "min_frame": "26774",
+    "max_frame": "26977",
+    "label_idx": 13,
+    "timestamp": "2026-01-26 17:23:11"
+  }
+}

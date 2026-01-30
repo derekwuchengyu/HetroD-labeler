@@ -7,7 +7,7 @@ import os
 from time import time
 from video_controller import video_controller
 from datetime import datetime
-
+#  python -m PyQt6.uic.pyuic label.ui -o UI.py
 
 
 class MainWindow_controller(QMainWindow):
@@ -17,7 +17,8 @@ class MainWindow_controller(QMainWindow):
         self.ui.setupUi(self)
 
         # 設定要篩選的 label_idx 值
-        LABEL_IDX = 9
+        LABEL_IDX = 88
+        self.label_num = 15
 
         # 根據 UI 模組決定 ToolTip 字體大小
         
@@ -28,7 +29,7 @@ class MainWindow_controller(QMainWindow):
 
 
         self.data_path = "../data"
-        self.DATA_ID = DATA_ID  # <--- 請根據實際需求設置
+        self.DATA_ID = DATA_ID
 
         print(f"Loading track #{self.DATA_ID} data...")
         start_time = time()
@@ -39,7 +40,7 @@ class MainWindow_controller(QMainWindow):
 
         # with open(f'{self.data_path}/pet_distance_dict.json', 'r', encoding='utf-8') as f:
         #     self.pet_min_distance_dict = orjson.loads(f.read())
-        self.pet_results_df = pd.read_parquet(f'../data/{self.DATA_ID}_pet_collisions.parquet')
+        self.pet_results_df = pd.read_parquet(f'../data/{self.DATA_ID}_pet_optimized.parquet')
         
         print(f"load pet_distance_dict.parquet time: {time() - start_time:.2f} sec")
 
@@ -96,7 +97,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
         # 設定 label 按鈕點擊事件
-        for i in range(0, 14):
+        for i in list(range(0, self.label_num+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
         
@@ -107,6 +108,9 @@ class MainWindow_controller(QMainWindow):
         self.selected_label_btn_idx = None  # 記錄目前選中的 label 按鈕
 
         self.ui.pushButton_check_label_done.clicked.connect(self.save_current_checked)
+
+        # 新增 reset frame range bar 按鈕事件
+        self.ui.pushButton_reset_frame_range.clicked.connect(self.reset_frame_range_bar)
 
         self.update_combobox_label_info()
 
@@ -121,9 +125,9 @@ class MainWindow_controller(QMainWindow):
     def set_label_tooltips(self, enable=True):
         self.ui.pushButton_label_1.setToolTip("ego 路口直行，遇到對向左轉 \n{Car, Truck, Motor/Bike}" if enable else "")
         self.ui.pushButton_label_2.setToolTip("ego 路口左轉，遇到對向直行 \n{Car, Truck, Motor/Bike}" if enable else "")
-        self.ui.pushButton_label_3.setToolTip("ego 與機踏車並行，機踏車加速通過" if enable else "")
-        self.ui.pushButton_label_4.setToolTip("ego 與機踏車並行，機踏車等速並行" if enable else "")
-        self.ui.pushButton_label_5.setToolTip("ego 與機踏車並行，機踏車減速" if enable else "")
+        self.ui.pushButton_label_3.setToolTip("ego 與機踏車同車道並行，機踏車自側後方加速超越" if enable else "")
+        self.ui.pushButton_label_4.setToolTip("ego 與機踏車同車道並行，機踏車等速並行" if enable else "")
+        self.ui.pushButton_label_5.setToolTip("ego 與機踏車同車道並行，機踏車自側前方減速被ego超越" if enable else "")
         self.ui.pushButton_label_6.setToolTip("ego 前方同車道有停止車（等左轉/臨停）\n，ego 通過前未移動即算，需換道 (含佔用一點車道情況)，例：338,913,1096,1997" if enable else "")
         self.ui.pushButton_label_7.setToolTip("前方 {Car, Truck, Motor/Bike} 從右側 cut-in" if enable else "")
         self.ui.pushButton_label_8.setToolTip("前方 {Car, Truck, Motor/Bike} 從左側 cut-in" if enable else "")
@@ -131,6 +135,9 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_10.setToolTip("ego 左轉，對向機踏車準備待轉" if enable else "")
         self.ui.pushButton_label_11.setToolTip("ego 右轉後遇見行人通過" if enable else "")
         self.ui.pushButton_label_12.setToolTip("ego 左轉後遇見行人通過" if enable else "")
+        self.ui.pushButton_label_13.setToolTip("ego 向右切出車道遇到右側直行汽機車" if enable else "")
+        self.ui.pushButton_label_14.setToolTip("ego 向左切出車道遇到左側直行汽機車" if enable else "")
+        self.ui.pushButton_label_15.setToolTip("ego 左轉遇到左側機踏車通過" if enable else "")
         
     def update_combobox_label_info(self):
         # label_combobox_ego_id
@@ -196,9 +203,9 @@ class MainWindow_controller(QMainWindow):
                     pass
 
         # 設定按鈕顏色
-        car_truck_labels = [0, 1, 2, 6, 7, 8, 13]
-        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13]
-        ped_labels = [0, 11, 12, 13]
+        car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
+        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
+        ped_labels = [0, 11, 12, 88]
         cls = self.trackid_class.get(str(other_actor_id), "unknown").lower()
         blue_labels = set()
         if cls in ["car", "truck"]:
@@ -208,7 +215,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(ped_labels)
 
-        for i in range(0, 14):
+        for i in range(0, self.label_num + 1):
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -311,9 +318,9 @@ class MainWindow_controller(QMainWindow):
         # 取得目前 class
         other_actor_class = actor_id
         other_actor_class = self.trackid_class.get(str(other_actor_class), "unknown").lower()
-        car_truck_labels = [0, 1, 2, 6, 7, 8, 13]
-        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13]
-        ped_labels = [0, 11, 12, 13]
+        car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
+        motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 88]
+        ped_labels = [0, 11, 12, 13, 14, 88]
         blue_labels = set()
         if other_actor_class in ["car", "truck"]:
             blue_labels = set(car_truck_labels)
@@ -340,7 +347,7 @@ class MainWindow_controller(QMainWindow):
             # self.selected_label_idx_99 = False  # 重置 99 flag
 
         # 更新 UI 按鈕顏色
-        for i in range(0, 14):
+        for i in list(range(0, self.label_num+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -358,7 +365,8 @@ class MainWindow_controller(QMainWindow):
         max_frame = self.video_controller.overlay_frame_list[max_frame]
 
         scenario_data = {
-            "id_pair": id_pair,
+            "ego_id": ego_id,
+            "actor_id": actor_id,
             "min_frame": min_frame,
             "max_frame": max_frame,
             "label_idx": self.selected_label_idx,
@@ -457,3 +465,9 @@ class MainWindow_controller(QMainWindow):
         # 更新按鈕顏色
         self.ui.pushButton_special_scenario.setStyleSheet("color: red;" if self.selected_special_scenario else "color: black;")
 
+    def reset_frame_range_bar(self):
+        """重設 frame range bar 到初始狀態"""
+        self.video_controller.range_slider.setMinimum(0)
+        self.video_controller.range_slider.setValue((0, len(self.video_controller.overlay_frame_list) - 1))
+        self.video_controller.setslidervalue(0)
+        self.video_controller.current_frame_no = 0

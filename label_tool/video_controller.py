@@ -8,7 +8,7 @@ import orjson
 import os  # add for file path
 
 from superqt import QRangeSlider
-from PyQt6.QtWidgets import QMessageBox, QFileDialog
+from PyQt6.QtWidgets import QMessageBox, QFileDialog, QPushButton
 import imageio
 
 
@@ -38,6 +38,11 @@ def draw_rotated_bbox(img, x, y, width, length, heading, color=(0,255,0), thickn
 
 ortho_px_to_meter = 0.0499967249445942
 
+class DoubleClickButton(QPushButton):
+    doubleClicked = QtCore.pyqtSignal()
+    def mouseDoubleClickEvent(self, event):
+        self.doubleClicked.emit()
+        super().mouseDoubleClickEvent(event)
 
 class video_controller(object):
     def __init__(self, data_path,  ui, DATA_ID):
@@ -94,10 +99,19 @@ class video_controller(object):
 
         self.route_index = 0
 
+        # Replace pushButton_play_or_stop with DoubleClickButton if not already
+        orig_btn = self.ui.pushButton_play_or_stop
+        parent = orig_btn.parent()
+        geometry = orig_btn.geometry()
+        orig_btn.hide()
+        self.ui.pushButton_play_or_stop = DoubleClickButton(parent)
+        self.ui.pushButton_play_or_stop.setGeometry(geometry)
+        self.ui.pushButton_play_or_stop.setText(orig_btn.text())
+        self.ui.pushButton_play_or_stop.show()
+
         self.ui.pushButton_play_or_stop.clicked.connect(self.toggle_play_or_stop)
+        self.ui.pushButton_play_or_stop.doubleClicked.connect(self.on_play_or_stop_double_clicked)
         self.update_play_or_stop_button_text()
-        
-        self.ui.pushButton_show_object_location.clicked.connect(self.toggle_show_object_location)
 
         # connect button for video/gif export
         self.ui.pushButton_make_video_gif.clicked.connect(self.make_video_gif)
@@ -294,6 +308,21 @@ class video_controller(object):
         bytesPerline = 3 * self.image_width
         
         frame = self.__update_label_onscreen(frame)
+
+        min_frame_idx = self.ui.slider_videoframe.value()
+        self.abs_frame_no = int(self.overlay_frame_list[min_frame_idx])
+        
+        # 顯示當前 frame 編號於左上角
+        cv2.putText(
+            frame,
+            f"Frame: {self.abs_frame_no + 1}",
+            (10, 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (255, 255, 255),
+            2,
+            cv2.LINE_AA
+        )
         
         qimg = QImage(frame, self.image_width, self.image_height, bytesPerline, QImage.Format.Format_RGB888).rgbSwapped()
         self.qpixmap = QPixmap.fromImage(qimg)
@@ -361,7 +390,7 @@ class video_controller(object):
         
     def play(self):
         self.videoplayer_state = "play"
-        self.current_frame_no = 0
+        # self.current_frame_no = 0
         # print(self.current_speed_interval)
         self.timer.start(self.current_speed_interval)
         self.update_play_or_stop_button_text()
@@ -377,6 +406,12 @@ class video_controller(object):
             self.stop()
         else:
             self.play()
+
+    def on_play_or_stop_double_clicked(self):
+        # 雙擊時重置到第一幀並播放
+        self.current_frame_no = 0
+        self.setslidervalue(0)
+        self.play()
 
     def on_range_slider_changed(self, value):
         min_frame, max_frame = value
