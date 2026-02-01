@@ -1,3 +1,5 @@
+import base64
+from zipfile import Path
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QProgressBar
 from PyQt6.QtGui import QIcon, QFont
@@ -7,18 +9,21 @@ import os
 from time import time
 from video_controller import video_controller
 from datetime import datetime
+import platform
+import base64
+from pathlib import Path
 #  python -m PyQt6.uic.pyuic label.ui -o UI.py
 
 
 class MainWindow_controller(QMainWindow):
-    def __init__(self, ui_class, DATA_ID='00'):
+    def __init__(self, ui_class, DATA_ID='00', LABEL_IDX=2):
         super().__init__() 
         self.ui = ui_class()  # 使用傳入的 UI 類別
         self.ui.setupUi(self)
 
         # 設定要篩選的 label_idx 值
-        LABEL_IDX = 88
-        self.label_max = 2
+        self.LABEL_IDX = LABEL_IDX
+        self.MAX_LABEL_IDX = 15
 
         self.motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
         self.car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
@@ -82,7 +87,7 @@ class MainWindow_controller(QMainWindow):
         """
 
         for id in keys:
-            if labeled_dict[id].get("label_idx", None) == LABEL_IDX:
+            if labeled_dict[id].get("label_idx", None) == self.LABEL_IDX:
                 self.ui.comboBox_ego_id.addItem(id)
 
 
@@ -101,7 +106,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
         # 設定 label 按鈕點擊事件
-        for i in list(range(0, self.label_max+1))+[88]:
+        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
         
@@ -216,7 +221,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(self.ped_labels)
 
-        for i in range(0, self.label_max + 1):
+        for i in range(0, self.MAX_LABEL_IDX + 1):
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -345,7 +350,7 @@ class MainWindow_controller(QMainWindow):
             # self.selected_label_idx_99 = False  # 重置 99 flag
 
         # 更新 UI 按鈕顏色
-        for i in list(range(0, self.label_max+1))+[88]:
+        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -384,6 +389,9 @@ class MainWindow_controller(QMainWindow):
         # 更新按鈕顏色
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
 
+        # 記錄按下時間
+        self.click_time()
+
     def _save_to_json(self, file_name, key, data):
         """通用儲存輔助函式"""
         path = os.path.join(self.data_path, file_name)
@@ -421,14 +429,17 @@ class MainWindow_controller(QMainWindow):
 
     def click_time(self):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_path = os.path.join(self.data_path, f"{self.DATA_ID}_label_time_recording.txt")
+        log_path = self._get_label_time_recording_path()
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"按下時間：{current_time}\n")
+            f.write(f"按下時間：[Refine] {current_time}\n")
 
     def save_current_checked(self):
         path = os.path.join(self.data_path, f"{self.DATA_ID}_label_check.txt")
         with open(path, "a", encoding="utf-8") as f:
             f.write(f"{self.ui.comboBox_ego_id.currentText()}\n")
+
+        self.set_label_button_selected(self.selected_label_idx)
+        # print("self.set_label_button_selected(:",self.selected_label_idx)
 
 
         # make this button to red after clicked
@@ -469,3 +480,16 @@ class MainWindow_controller(QMainWindow):
         self.video_controller.range_slider.setValue((0, len(self.video_controller.overlay_frame_list) - 1))
         self.video_controller.setslidervalue(0)
         self.video_controller.current_frame_no = 0
+
+    def _get_label_time_recording_path(self):
+        """產生帶有 login, node, cwd hash 的 label_time_recording 檔案路徑"""
+        login = os.getlogin()
+        node = platform.node()
+        current_file = Path(__file__).resolve()
+
+        # 取得上上一層目錄 (專案根目錄的parent)
+        project_root = current_file.parents[2]
+        hash_str = f"{login}_{node}_{project_root}"
+        encoded_id = base64.b64encode(hash_str.encode()).decode()
+        filename = f"log/{encoded_id}_{self.DATA_ID}_label_time_recording.txt"
+        return os.path.join(self.data_path, filename)

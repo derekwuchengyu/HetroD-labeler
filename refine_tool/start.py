@@ -12,6 +12,10 @@ def main():
                         type=str,
                         default='00',
                         help='Specify the DATA_ID to use')
+    parser.add_argument('--label', '-lb',
+                        type=int,
+                        default=2,
+                        help='Specify the label index to filter')
     
     args = parser.parse_args()
     
@@ -26,7 +30,7 @@ def main():
     
     # 建立主視窗，傳入對應的 UI 類別
     from controller import MainWindow_controller
-    window = MainWindow_controller(Ui_MainWindow, DATA_ID=args.data_id)
+    window = MainWindow_controller(Ui_MainWindow, DATA_ID=args.data_id, LABEL_IDX=args.label)
     window.show()
 
     sys.exit(app.exec())

@@ -6,14 +6,17 @@ import orjson
 import pickle
 import os
 from datetime import datetime
-import pandas as pd  # 新增
+import pandas as pd
+import platform
+import base64
+from pathlib import Path
 # python -m PyQt6.uic.pyuic label.ui -o UI.py
 
 
 class MainWindow_controller(QMainWindow):
     # 檔案快取
     _file_cache = {}
-    
+
     def __init__(self, ui_class, DATA_ID='01'):
         super().__init__() 
         self.ui = ui_class()  # 使用傳入的 UI 類別
@@ -29,7 +32,7 @@ class MainWindow_controller(QMainWindow):
 
         self.data_path = "../data"
         self.DATA_ID = DATA_ID
-        self.label_max = 15
+        self.MAX_LABEL_IDX = 15
 
         self.motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
         self.car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
@@ -97,7 +100,7 @@ class MainWindow_controller(QMainWindow):
 
 
         # 設定 label 按鈕點擊事件
-        for i in list(range(0, self.label_max+1))+[88]:
+        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
@@ -114,18 +117,11 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_show_unlabeled_ego.clicked.connect(self.toggle_show_only_unlabeled_ego)
         self.ui.pushButton_quick_setup.clicked.connect(self.quick_setup)
 
-        # pushButton_quick_setup 
-        # doubleSpinBox_pet_min --> -10
-        # doubleSpinBox_pet_max --> 10
-        # doubleSpinBox_distance_max --> 5
-        # checkBox_pet --> True
-        # checkBox_distance --> True
-
 
         start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_path = os.path.join(self.data_path, "label_time_recording.txt")
+        log_path = self._get_label_time_recording_path()
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"啟動時間：{start_time}\n")
+            f.write(f"啟動時間：[Label] {start_time}\n")
     def quick_setup(self):
         """快速設定功能"""
         self.click_time()  # 記錄按下時間
@@ -142,9 +138,9 @@ class MainWindow_controller(QMainWindow):
         
     def click_time(self):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_path = os.path.join(self.data_path, "label_time_recording.txt")
+        log_path = self._get_label_time_recording_path()
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(f"按下時間：{current_time}\n")
+            f.write(f"按下時間：[Label] {current_time}\n")
 
     def toggle_show_only_unlabeled_ego(self):
         self.click_time()
@@ -598,7 +594,6 @@ class MainWindow_controller(QMainWindow):
 
         # 設定按鈕顏色
         cls = self.trackid_class.get(str(actor_id), "unknown").lower()
-        print(cls, self.trackid_class, actor_id)
         blue_labels = set()
         if cls in ["car", "truck"]:
             blue_labels = set(self.car_truck_labels)
@@ -607,7 +602,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(self.ped_labels)
 
-        for i in list(range(0, self.label_max+1))+[88]:
+        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -680,7 +675,7 @@ class MainWindow_controller(QMainWindow):
 
         # 3. 更新 UI 按鈕顏色
         blue_labels = valid_indices - {99}
-        for i in list(range(0, self.label_max + 1)) + [88]:
+        for i in list(range(0, self.MAX_LABEL_IDX + 1)) + [88]:
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 if i == self.selected_label_idx:
@@ -809,3 +804,15 @@ class MainWindow_controller(QMainWindow):
         with open(path, "wb") as f:
             f.write(orjson.dumps(content, option=orjson.OPT_INDENT_2 | orjson.OPT_NON_STR_KEYS))
 
+    def _get_label_time_recording_path(self):
+        """產生帶有 login, node, cwd hash 的 label_time_recording 檔案路徑"""
+        login = os.getlogin()
+        node = platform.node()
+        current_file = Path(__file__).resolve()
+
+        # 取得上上一層目錄 (專案根目錄的parent)
+        project_root = current_file.parents[2]
+        hash_str = f"{login}_{node}_{project_root}"
+        encoded_id = base64.b64encode(hash_str.encode()).decode()
+        filename = f"log/{encoded_id}_{self.DATA_ID}_label_time_recording.txt"
+        return os.path.join(self.data_path, filename)
