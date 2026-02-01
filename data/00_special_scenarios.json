@@ -678,5 +678,110 @@
     "min_frame": "34497",
     "max_frame": "34763",
     "label_idx": 2
+  },
+  "1153_1118": {
+    "ego_id": "1153",
+    "actor_id": "1118",
+    "min_frame": "20378",
+    "max_frame": "21058",
+    "label_idx": 1
+  },
+  "1161_1239": {
+    "ego_id": "1161",
+    "actor_id": "1239",
+    "min_frame": "21964",
+    "max_frame": "22595",
+    "label_idx": 1
+  },
+  "1161_1230": {
+    "ego_id": "1161",
+    "actor_id": "1230",
+    "min_frame": "21965",
+    "max_frame": "22602",
+    "label_idx": 1
+  },
+  "1214_1204": {
+    "ego_id": "1214",
+    "actor_id": "1204",
+    "min_frame": "21221",
+    "max_frame": "21504",
+    "label_idx": 1
+  },
+  "1678_1617": {
+    "ego_id": "1678",
+    "actor_id": "1617",
+    "min_frame": "29429",
+    "max_frame": "30251",
+    "label_idx": 1
+  },
+  "1678_1619": {
+    "ego_id": "1678",
+    "actor_id": "1619",
+    "min_frame": "29394",
+    "max_frame": "30183",
+    "label_idx": 1
+  },
+  "1678_1646": {
+    "ego_id": "1678",
+    "actor_id": "1646",
+    "min_frame": "29466",
+    "max_frame": "30265",
+    "label_idx": 1
+  },
+  "1709_1646": {
+    "ego_id": "1709",
+    "actor_id": "1646",
+    "min_frame": "29731",
+    "max_frame": "30407",
+    "label_idx": 1
+  },
+  "1763_1773": {
+    "ego_id": "1763",
+    "actor_id": "1773",
+    "min_frame": "31397",
+    "max_frame": "31845",
+    "label_idx": 1
+  },
+  "1786_1664": {
+    "ego_id": "1786",
+    "actor_id": "1664",
+    "min_frame": "31504",
+    "max_frame": "31919",
+    "label_idx": 1
+  },
+  "1961_1967": {
+    "ego_id": "1961",
+    "actor_id": "1967",
+    "min_frame": "34858",
+    "max_frame": "35180",
+    "label_idx": 1
+  },
+  "1961_1963": {
+    "ego_id": "1961",
+    "actor_id": "1963",
+    "min_frame": "34813",
+    "max_frame": "35180",
+    "label_idx": 1
+  },
+  "1974_2019": {
+    "ego_id": "1974",
+    "actor_id": "2019",
+    "min_frame": "38227",
+    "max_frame": "39027",
+    "label_idx": 1
+  },
+  "2199_2194": {
+    "ego_id": "2199",
+    "actor_id": "2194",
+    "min_frame": "39487",
+    "max_frame": "39753",
+    "label_idx": 1
+  },
+  "2310_2306": {
+    "ego_id": "2310",
+    "actor_id": "2306",
+    "min_frame": "41860",
+    "max_frame": "42204",
+    "label_idx": 1
   }
 }

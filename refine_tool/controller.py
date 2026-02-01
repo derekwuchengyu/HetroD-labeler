@@ -120,6 +120,8 @@ class MainWindow_controller(QMainWindow):
 
         # 新增 reset frame range bar 按鈕事件
         self.ui.pushButton_reset_frame_range.clicked.connect(self.reset_frame_range_bar)
+        self.ui.pushButton_to_the_end.setToolTip("播放跳置frame range結束位置")
+        self.ui.pushButton_to_the_end.clicked.connect(self.to_the_end)
 
         self.update_combobox_label_info()
 
@@ -480,6 +482,12 @@ class MainWindow_controller(QMainWindow):
         self.video_controller.range_slider.setValue((0, len(self.video_controller.overlay_frame_list) - 1))
         self.video_controller.setslidervalue(0)
         self.video_controller.current_frame_no = 0
+
+    def to_the_end(self):
+        """播放跳置 frame range 結束位置"""
+        end_index = self.video_controller.range_slider.value()[1]
+        self.video_controller.setslidervalue(end_index)
+        self.video_controller.current_frame_no = end_index
 
     def _get_label_time_recording_path(self):
         """產生帶有 login, node, cwd hash 的 label_time_recording 檔案路徑"""

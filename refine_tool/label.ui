@@ -557,6 +557,19 @@
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="pushButton_to_the_end">
+    <property name="geometry">
+     <rect>
+      <x>1296</x>
+      <y>620</y>
+      <width>53</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>End</string>
+    </property>
+   </widget>
    <zorder>layoutWidget</zorder>
    <zorder>label_3</zorder>
    <zorder>label_videoframe</zorder>
@@ -578,6 +591,7 @@
    <zorder>pushButton_label_99</zorder>
    <zorder>pushButton_special_scenario</zorder>
    <zorder>groupBox</zorder>
+   <zorder>pushButton_to_the_end</zorder>
   </widget>
  </widget>
  <resources/>
