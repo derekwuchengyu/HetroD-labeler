@@ -3,7 +3,6 @@ from PyQt6.QtGui import QIcon, QFont
 
 from video_controller import video_controller
 import orjson
-import pickle
 import os
 from datetime import datetime
 import pandas as pd
