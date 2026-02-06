@@ -354,9 +354,9 @@ class MainWindow_controller(QMainWindow):
             for actor_id, (f0, f1) in self.unique_ego[ego_id][label_idx].items():
                 if label_idx in self.show_label:
                     agents.add(actor_id)
-                if min_frame is None or f0 < int(min_frame):
+                if min_frame is None or int(f0) < int(min_frame):
                     min_frame = f0
-                if max_frame is None or f1 > int(max_frame):
+                if max_frame is None or int(f1) > int(max_frame):
                     max_frame = f1
         agent_list = list(agents)
         current_frame_no = self.video_controller.current_frame_no

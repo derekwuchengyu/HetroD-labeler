@@ -53,6 +53,7 @@ class BaseVideoController(object):
         self.data_path = data_path
         self.ui = ui
         self.DATA_ID = DATA_ID
+        self.debug = True
 
         self.show_object_location_trigger = False
         self._onscreen_render_cache = {}
@@ -108,8 +109,12 @@ class BaseVideoController(object):
             self.trackid_class = orjson.loads(f.read())
 
         # 載入 track dict
-        with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'r', encoding='utf-8') as f:
-            self.track_dict = orjson.loads(f.read())
+        if self.debug:
+            with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict_mini.json', 'r', encoding='utf-8') as f:
+                self.track_dict = orjson.loads(f.read())
+        else:
+            with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict.json', 'r', encoding='utf-8') as f:
+                self.track_dict = orjson.loads(f.read())
 
         self.current_frame_no = 0
         self.videoplayer_state = "play"
