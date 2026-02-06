@@ -1,6 +1,6 @@
 import base64
 from zipfile import Path
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QMessageBox, QTableWidgetItem, QMainWindow, QProgressBar,
     QCheckBox, QVBoxLayout, QGroupBox
@@ -12,6 +12,7 @@ import os
 from time import time
 from video_controller import video_controller
 from datetime import datetime
+from time import time
 import platform
 import base64
 from pathlib import Path
@@ -109,7 +110,8 @@ class MainWindow_controller(QMainWindow):
         self.ui.comboBox_ego_id.clear()
         for id in ego_ids:
             if len(set(self.unique_ego[id].keys())-{0}) == 0:
-                continue
+                pass
+                # continue
             self.ui.comboBox_ego_id.addItem(id)
 
         self.update_combobox_label_info()
@@ -147,6 +149,10 @@ class MainWindow_controller(QMainWindow):
         for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
+
+        # 綁定快捷鍵
+        self._bind_shortcuts()
+        self._last_space_press_time = 0
 
     def toggle_label_tooltips(self):
         self.label_tooltip_on = not self.label_tooltip_on
@@ -413,3 +419,49 @@ class MainWindow_controller(QMainWindow):
     def update_video_for_selected_labels(self):
         # 已由 update_agents_display 取代
         pass
+
+
+    def _bind_shortcuts(self):
+        # 讓主視窗能接收鍵盤事件
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setFocus()
+        # 若有需要可在這裡做額外設定
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        # PyQt6.QtCore.Qt.Key_X
+        if key == Qt.Key.Key_A:
+            self.ui.pushButton_prev_actor.click()
+        elif key == Qt.Key.Key_D:
+            self.ui.pushButton_next_actor.click()
+        elif key == Qt.Key.Key_Space:
+            now = time()
+            double_click = (now - getattr(self, "_last_space_press_time", 0)) < 0.3
+            self._last_space_press_time = now
+            if hasattr(self.ui, "pushButton_play_or_stop"):
+                if double_click:
+                    self.video_controller.on_play_or_stop_double_clicked()
+                else:
+                    self.ui.pushButton_play_or_stop.click()
+        elif key == Qt.Key.Key_Up:
+            # 增加播放速度（上）
+            combo = self.ui.comboBox_speed
+            speed_list = [combo.itemText(i) for i in range(combo.count())]
+            try:
+                idx = speed_list.index(combo.currentText())
+                if idx > 0:
+                    combo.setCurrentText(speed_list[idx - 1])
+            except ValueError:
+                pass
+        elif key == Qt.Key.Key_Down:
+            # 降低播放速度（下）
+            combo = self.ui.comboBox_speed
+            speed_list = [combo.itemText(i) for i in range(combo.count())]
+            try:
+                idx = speed_list.index(combo.currentText())
+                if idx < len(speed_list) - 1:
+                    combo.setCurrentText(speed_list[idx + 1])
+            except ValueError:
+                pass
+        else:
+            super().keyPressEvent(event)

@@ -92,7 +92,8 @@
     "actor_id": "29",
     "min_frame": "0",
     "max_frame": "91",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 18:02:04"
   },
   "2_10": {
     "ego_id": "2",
@@ -107,14 +108,16 @@
     "actor_id": "54",
     "min_frame": "18",
     "max_frame": "513",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 18:03:49"
   },
   "2_6": {
     "ego_id": "2",
     "actor_id": "6",
     "min_frame": "0",
     "max_frame": "513",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 18:21:41"
   },
   "2_20": {
     "ego_id": "2",

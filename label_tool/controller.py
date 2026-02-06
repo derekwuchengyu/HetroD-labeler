@@ -1,11 +1,13 @@
 from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow
 from PyQt6.QtGui import QIcon, QFont
+from PyQt6.QtCore import Qt
 
 from video_controller import video_controller
 import orjson
 import os
 import sys
 from datetime import datetime
+from time import time
 import pandas as pd
 import platform
 import base64
@@ -125,6 +127,11 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_this_ego_done.clicked.connect(self.mark_this_ego_done)
         self.ui.pushButton_show_unlabeled_ego.clicked.connect(self.toggle_show_only_unlabeled_ego)
         self.ui.pushButton_quick_setup.clicked.connect(self.quick_setup)
+
+
+        # 綁定快捷鍵
+        self._bind_shortcuts()
+        self._last_space_press_time = 0
 
 
         start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -826,3 +833,49 @@ class MainWindow_controller(QMainWindow):
         encoded_id = base64.b64encode(hash_str.encode()).decode()
         filename = f"log/{encoded_id}_{self.DATA_ID}_label_time_recording.txt"
         return os.path.join(self.data_path, filename)
+    
+
+    def _bind_shortcuts(self):
+        # 讓主視窗能接收鍵盤事件
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setFocus()
+        # 若有需要可在這裡做額外設定
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        # PyQt6.QtCore.Qt.Key_X
+        if key == Qt.Key.Key_A:
+            self.ui.pushButton_prev_actor.click()
+        elif key == Qt.Key.Key_D:
+            self.ui.pushButton_next_actor.click()
+        elif key == Qt.Key.Key_Space:
+            now = time()
+            double_click = (now - getattr(self, "_last_space_press_time", 0)) < 0.3
+            self._last_space_press_time = now
+            if hasattr(self.ui, "pushButton_play_or_stop"):
+                if double_click:
+                    self.video_controller.on_play_or_stop_double_clicked()
+                else:
+                    self.ui.pushButton_play_or_stop.click()
+        elif key == Qt.Key.Key_Up:
+            # 增加播放速度（上）
+            combo = self.ui.comboBox_speed
+            speed_list = [combo.itemText(i) for i in range(combo.count())]
+            try:
+                idx = speed_list.index(combo.currentText())
+                if idx > 0:
+                    combo.setCurrentText(speed_list[idx - 1])
+            except ValueError:
+                pass
+        elif key == Qt.Key.Key_Down:
+            # 降低播放速度（下）
+            combo = self.ui.comboBox_speed
+            speed_list = [combo.itemText(i) for i in range(combo.count())]
+            try:
+                idx = speed_list.index(combo.currentText())
+                if idx < len(speed_list) - 1:
+                    combo.setCurrentText(speed_list[idx + 1])
+            except ValueError:
+                pass
+        else:
+            super().keyPressEvent(event)
