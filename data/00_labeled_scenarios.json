@@ -89,7 +89,7 @@
     "min_frame": "90",
     "max_frame": "513",
     "label_idx": 1,
-    "timestamp": "2026-02-01 17:36:49"
+    "timestamp": "2026-02-06 11:58:39"
   },
   "2_54": {
     "ego_id": "2",
@@ -1026,7 +1026,8 @@
     "actor_id": "35",
     "min_frame": "0",
     "max_frame": "186",
-    "label_idx": 1
+    "label_idx": 1,
+    "timestamp": "2026-02-06 11:58:35"
   },
   "12_8": {
     "ego_id": "12",
@@ -40887,8 +40888,8 @@
     "actor_id": "844",
     "min_frame": "14161",
     "max_frame": "14407",
-    "label_idx": 9,
-    "timestamp": "2026-01-22 22:41:48"
+    "label_idx": 13,
+    "timestamp": "2026-02-04 12:47:25"
   },
   "827_817": {
     "ego_id": "827",
@@ -64325,9 +64326,9 @@
     "ego_id": "1261",
     "actor_id": "1260",
     "min_frame": "22287",
-    "max_frame": "22571",
-    "label_idx": 9,
-    "timestamp": "2026-01-22 23:01:34"
+    "max_frame": "22869",
+    "label_idx": 88,
+    "timestamp": "2026-02-04 12:39:28"
   },
   "1261_1263": {
     "ego_id": "1261",

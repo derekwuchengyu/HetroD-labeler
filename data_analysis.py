@@ -13,7 +13,8 @@ if __name__ == "__main__":
     argv = argparse.ArgumentParser()
     argv.add_argument('-i', '--id', type=str, default='00', help='Data index to XX_labeled_scenarios.json')
     args = argv.parse_args()
-    file_path = f'./data/{args.id}_labeled_scenarios.json'
+    # file_path = f'./data/{args.id}_labeled_scenarios.json'
+    file_path = f'/home/hcis-s19/Documents/ChengYu/HetroD-labeler/data/{args.id}_labeled_scenarios.json'
 
     idx_to_label = {
         0: "None",
@@ -39,6 +40,7 @@ if __name__ == "__main__":
     # print(scenarios.keys())
 
     label_counts = {k: 0 for k in idx_to_label.keys()}
+    unique_ego = set()
     
     for key in scenarios.keys():
         ego_id = scenarios[key]['ego_id']
@@ -46,6 +48,9 @@ if __name__ == "__main__":
         min_frame = scenarios[key]['min_frame']
         max_frame = scenarios[key]['max_frame']
         label_idx = scenarios[key]['label_idx']
+
+        if label_idx != 0:
+            unique_ego.add((ego_id, label_idx))
 
         # ignore index 0 (None)
 
@@ -66,6 +71,9 @@ if __name__ == "__main__":
     print("-" * 70)
     print(f"{'總計':<2} | {total_count:5d}     | 100.0%")
     print("=" * 70)
+
+    print(f"獨立 (Ego, Label_idx) 車輛數量: {len(unique_ego)}")
+
 
 
 

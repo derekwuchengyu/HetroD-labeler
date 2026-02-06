@@ -783,5 +783,19 @@
     "min_frame": "41860",
     "max_frame": "42204",
     "label_idx": 1
+  },
+  "561_682": {
+    "ego_id": "561",
+    "actor_id": "682",
+    "min_frame": "11410",
+    "max_frame": "11963",
+    "label_idx": 9
+  },
+  "1411_1451": {
+    "ego_id": "1411",
+    "actor_id": "1451",
+    "min_frame": "26428",
+    "max_frame": "27781",
+    "label_idx": 9
   }
 }

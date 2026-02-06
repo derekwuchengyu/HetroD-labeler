@@ -277,6 +277,25 @@ class BaseVideoController(object):
         except:
             pass
 
+        # 多 agent 顯示（如果 current_agent_ids 有內容就畫）
+        if hasattr(self, "current_agent_ids") and self.current_agent_ids:
+            for aid in self.current_agent_ids:
+                try:
+                    row = self.track_dict[aid][current_frame][0]
+                    x = row['xCenter'] / ortho_px_to_meter
+                    y = -row['yCenter'] / ortho_px_to_meter
+                    heading = row['heading']
+                    width = row['width'] / ortho_px_to_meter
+                    length = row['length'] / ortho_px_to_meter
+                    actor_class = self.trackid_class.get(str(aid), "unknown")
+                    color = (255, 0, 0) if actor_class != "pedestrian" else (255, 0, 255)
+                    if actor_class == "pedestrian":
+                        cv2.circle(frame, (int(x), int(y)), 15, color, thickness=-1)
+                    else:
+                        draw_rotated_bbox(frame, x, y, width, length, heading, color=color)
+                except:
+                    pass
+
         # 繪製 other actor bbox
         other_actor_class = self.trackid_class.get(str(current_other_actor_id), "unknown")
         try:
@@ -389,13 +408,13 @@ class BaseVideoController(object):
         else:
             step = int(speed)
 
-        if self.current_frame_no + step > max_frame:
+        if self.current_frame_no > max_frame:
             self.current_frame_no = max_frame
             self.videoplayer_state = "stop"
             self.update_play_or_stop_button_text()
         else:
             self.current_frame_no += step
-            self.setslidervalue(self.current_frame_no)
+        self.setslidervalue(self.current_frame_no)
 
     def getslidervalue(self, value=None):
         """取得 slider 值"""
