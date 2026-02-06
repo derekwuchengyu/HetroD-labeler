@@ -9,6 +9,8 @@ import os
 from superqt import QRangeSlider
 import imageio
 
+from common_vars import DEBUG_MODE
+
 
 def draw_rotated_bbox(img, x, y, width, length, heading, color=(0,255,0), thickness=2):
     """繪製旋轉的邊界框"""
@@ -45,13 +47,13 @@ class BaseVideoController(object):
     """視訊控制器基底類別 - 包含所有共用功能"""
 
     # 子類別可覆寫的屬性
-    USE_SECONDARY_SLIDER = False  # 是否使用 secondary_slider
+    USE_SECONDARY_SLIDER = True  # 是否使用 secondary_slider
     BACKGROUND_FILENAME_TEMPLATE = "{DATA_ID}_background.png"  # 背景圖檔名模板
     DEFAULT_TIMER_INTERVAL = 30  # 預設 timer interval (ms)
     
 
     def __init__(self, data_path, ui, DATA_ID):
-        self.debug_mode = False
+        self.debug_mode = DEBUG_MODE
         
         self.data_path = data_path
         self.ui = ui

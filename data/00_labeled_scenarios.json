@@ -4,77 +4,88 @@
     "actor_id": "40",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:23:58"
   },
   "0_58": {
     "ego_id": "0",
     "actor_id": "58",
     "min_frame": "89",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:20"
   },
   "0_20": {
     "ego_id": "0",
     "actor_id": "20",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:29"
   },
   "0_6": {
     "ego_id": "0",
     "actor_id": "6",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:32"
   },
   "0_63": {
     "ego_id": "0",
     "actor_id": "63",
     "min_frame": "135",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:38"
   },
   "0_50": {
     "ego_id": "0",
     "actor_id": "50",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:42"
   },
   "0_24": {
     "ego_id": "0",
     "actor_id": "24",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:44"
   },
   "0_55": {
     "ego_id": "0",
     "actor_id": "55",
     "min_frame": "31",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:52"
   },
   "0_23": {
     "ego_id": "0",
     "actor_id": "23",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:56"
   },
   "0_22": {
     "ego_id": "0",
     "actor_id": "22",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:57"
   },
   "0_4": {
     "ego_id": "0",
     "actor_id": "4",
     "min_frame": "0",
     "max_frame": "137",
-    "label_idx": 0
+    "label_idx": 0,
+    "timestamp": "2026-02-06 17:54:59"
   },
   "0_29": {
     "ego_id": "0",

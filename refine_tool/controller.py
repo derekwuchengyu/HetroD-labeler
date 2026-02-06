@@ -1,4 +1,3 @@
-import base64
 from zipfile import Path
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QProgressBar
@@ -6,12 +5,22 @@ from PyQt6.QtGui import QIcon, QFont
 import pandas as pd
 import orjson
 import os
+import sys
 from time import time
 from video_controller import video_controller
 from datetime import datetime
 import platform
 import base64
 from pathlib import Path
+
+sys.path.append('../')
+from common_vars import (
+    DATA_PATH, 
+    MAX_LABEL_IDX, 
+    MOTOR_BIKE_LABELS,
+    CAR_TRUCK_LABELS,
+    PED_LABELS
+)
 #  python -m PyQt6.uic.pyuic label.ui -o UI.py
 
 
@@ -23,11 +32,11 @@ class MainWindow_controller(QMainWindow):
 
         # 設定要篩選的 label_idx 值
         self.LABEL_IDX = LABEL_IDX
-        self.MAX_LABEL_IDX = 15
+        self.MAX_LABEL_IDX = MAX_LABEL_IDX
 
-        self.motor_bike_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 88]
-        self.car_truck_labels = [0, 1, 2, 6, 7, 8, 13, 14, 88]
-        self.ped_labels = [0, 11, 12, 88]
+        self.motor_bike_labels = MOTOR_BIKE_LABELS
+        self.car_truck_labels = CAR_TRUCK_LABELS
+        self.ped_labels = PED_LABELS
 
         # 根據 UI 模組決定 ToolTip 字體大小
         
@@ -37,7 +46,7 @@ class MainWindow_controller(QMainWindow):
             self.setStyleSheet("QToolTip { font-size: 24pt; }")
 
 
-        self.data_path = "../data"
+        self.data_path = DATA_PATH
         self.DATA_ID = DATA_ID
 
         print(f"Loading track #{self.DATA_ID} data...")
@@ -149,6 +158,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_13.setToolTip("ego 向右切出車道遇到右側直行汽機車" if enable else "")
         self.ui.pushButton_label_14.setToolTip("ego 向左切出車道遇到左側直行汽機車" if enable else "")
         self.ui.pushButton_label_15.setToolTip("ego 左轉遇到左側機踏車通過" if enable else "")
+        self.ui.pushButton_label_16.setToolTip("ego 跟車" if enable else "")
         
     def update_combobox_label_info(self):
         # label_combobox_ego_id

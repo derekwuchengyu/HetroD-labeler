@@ -9,7 +9,7 @@ import orjson
 class video_controller(BaseVideoController):
     """Refine tool 專用的視訊控制器"""
     
-    USE_SECONDARY_SLIDER = True
+    USE_SECONDARY_SLIDER = False
     BACKGROUND_FILENAME_TEMPLATE = "00_background.png"  # refine_tool 使用固定的背景檔名
 
     def __init__(self, data_path, ui, DATA_ID):
@@ -87,7 +87,8 @@ class video_controller(BaseVideoController):
         self.total_frame_count = len(self.overlay_frame_list)
 
         self.ui.slider_videoframe.setRange(0, self.total_frame_count - 1)
-        self.secondary_slider.setRange(0, self.total_frame_count - 1)
+        if self.USE_SECONDARY_SLIDER:
+            self.secondary_slider.setRange(0, self.total_frame_count - 1)
         self.range_slider.setMinimum(0)
         self.range_slider.setMaximum(self.total_frame_count - 1)
         self.range_slider.setValue((0, self.total_frame_count - 1))
@@ -98,17 +99,20 @@ class video_controller(BaseVideoController):
                 min_idx = self.overlay_frame_list.index(str(min_frame_in_all))
                 max_idx = self.overlay_frame_list.index(str(max_frame_in_all))
                 self.ui.slider_videoframe.setValue(min_idx)
-                self.secondary_slider.setValue(min_idx)
+                if self.USE_SECONDARY_SLIDER:
+                    self.secondary_slider.setValue(min_idx)
                 self.range_slider.setValue((min_idx, max_idx))
                 self.current_frame_no = min_idx
             except ValueError:
                 self.current_frame_no = 0
                 self.ui.slider_videoframe.setValue(0)
-                self.secondary_slider.setValue(0)
+                if self.USE_SECONDARY_SLIDER:
+                    self.secondary_slider.setValue(0)
         else:
             self.current_frame_no = 0
             self.ui.slider_videoframe.setValue(0)
-            self.secondary_slider.setValue(0)
+            if self.USE_SECONDARY_SLIDER:
+                self.secondary_slider.setValue(0)
 
         frame = self.image_background.copy()
         self._onscreen_render_cache = {}
@@ -177,7 +181,8 @@ class video_controller(BaseVideoController):
             return
 
         self.ui.slider_videoframe.setRange(0, self.total_frame_count - 1)
-        self.secondary_slider.setRange(0, self.total_frame_count - 1)
+        if self.USE_SECONDARY_SLIDER:
+            self.secondary_slider.setRange(0, self.total_frame_count - 1)
         self.range_slider.setMinimum(0)
         self.range_slider.setMaximum(self.total_frame_count - 1)
         self.range_slider.setValue((0, self.total_frame_count - 1))
@@ -193,7 +198,8 @@ class video_controller(BaseVideoController):
         self.overlay_frame_list = []
         self.total_frame_count = 0
         self.ui.slider_videoframe.setRange(0, 0)
-        self.secondary_slider.setRange(0, 0)
+        if self.USE_SECONDARY_SLIDER:
+            self.secondary_slider.setRange(0, 0)
         self.range_slider.setMinimum(0)
         self.range_slider.setMaximum(0)
         self.range_slider.setValue((0, 0))

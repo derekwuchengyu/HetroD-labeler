@@ -15,6 +15,7 @@ from datetime import datetime
 import platform
 import base64
 from pathlib import Path
+from common_vars import DATA_PATH, MAX_LABEL_IDX
 #  python -m PyQt6.uic.pyuic label.ui -o UI.py
 
 
@@ -25,7 +26,9 @@ class MainWindow_controller(QMainWindow):
         self.ui.setupUi(self)
 
         # 設定要篩選的 label_idx 值
-        self.MAX_LABEL_IDX = 15
+        self.MAX_LABEL_IDX = MAX_LABEL_IDX
+        self.MAX_ACTORS_PER_EGO = 100
+        self.MAX_FRAME_RANGE = 9000
 
 
         # 根據 UI 模組決定 ToolTip 字體大小
@@ -35,7 +38,7 @@ class MainWindow_controller(QMainWindow):
             self.setStyleSheet("QToolTip { font-size: 24pt; }")
 
 
-        self.data_path = "../data"
+        self.data_path = DATA_PATH
         self.DATA_ID = DATA_ID
 
         self.show_label = set()
@@ -127,6 +130,9 @@ class MainWindow_controller(QMainWindow):
         self.ui.comboBox_ego_id.currentIndexChanged.connect(self.update_label_checkboxes)
         self.ui.pushButton_next_actor.clicked.connect(self.next_actor)
         self.ui.pushButton_prev_actor.clicked.connect(self.prev_actor)
+        self.label_tooltip_on = False  # 預設關閉
+        self.ui.pushButton_label_notice_on.setText("開啟label 提示")
+        self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
         self.video_controller = video_controller(data_path=self.data_path, ui=self.ui, DATA_ID=self.DATA_ID)
 
@@ -166,6 +172,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_13.setToolTip("ego 向右切出車道遇到右側直行汽機車" if enable else "")
         self.ui.pushButton_label_14.setToolTip("ego 向左切出車道遇到左側直行汽機車" if enable else "")
         self.ui.pushButton_label_15.setToolTip("ego 左轉遇到左側機踏車通過" if enable else "")
+        self.ui.pushButton_label_16.setToolTip("ego 跟車" if enable else "")
         
     def update_combobox_label_info(self):
         print("Updating combobox label info...")
@@ -283,7 +290,7 @@ class MainWindow_controller(QMainWindow):
             self.ui.comboBox_ego_id.setCurrentIndex(prev_index)
         else:
             self.ui.comboBox_ego_id.setCurrentIndex(total - 1)
-            
+
         self.video_controller.range_slider.setMinimum(0)
         self.video_controller.setslidervalue(0)
         self.video_controller.current_frame_no = 0
@@ -340,8 +347,8 @@ class MainWindow_controller(QMainWindow):
             self.label_checkbox_layout.addWidget(cb)
             self.label_checkboxes[label_idx] = cb
 
-        # 預設全選（不含0），如果沒有可選label則清空
-        valid_labels = set(label_indices) - {0}
+        # 預設全選，如果沒有可選label則清空
+        valid_labels = set(label_indices) # - {0}
         self.show_label = valid_labels.copy()
         for label_idx, cb in self.label_checkboxes.items():
             cb.setChecked(label_idx in self.show_label)
@@ -363,9 +370,21 @@ class MainWindow_controller(QMainWindow):
                     min_frame = f0
                 if max_frame is None or int(f1) > int(max_frame):
                     max_frame = f1
-        agent_list = list(agents)
+
+        # 限制 actor 數量
+        if len(agents) > self.MAX_ACTORS_PER_EGO:
+            QMessageBox.warning(self, "警告", f"該 ego {ego_id} 之 actor 數量過多（{len(agents)}），僅顯示前 {self.MAX_ACTORS_PER_EGO} 個。")
+            agent_list = list(agents)[:self.MAX_ACTORS_PER_EGO]
+        else:
+            agent_list = list(agents)
+
+        # 限制 frame 範圍
+        if min_frame is not None and max_frame is not None and int(max_frame) - int(min_frame) > self.MAX_FRAME_RANGE:
+            QMessageBox.warning(self, "警告", f"該 ego {ego_id} 之 frame 範圍過大（{int(max_frame)-int(min_frame)}），僅顯示前 {self.MAX_FRAME_RANGE} frame。")
+            max_frame = str(int(min_frame) + self.MAX_FRAME_RANGE)
+
         current_frame_no = self.video_controller.current_frame_no
-        if agent_list and min_frame is not None and max_frame is not None and min_frame <= max_frame:
+        if agent_list and min_frame is not None and max_frame is not None and int(min_frame) <= int(max_frame):
             self.video_controller.show_agents(ego_id, agent_list, min_frame, max_frame)
             if self.video_controller.total_frame_count > 0:
                 frame_no = min(current_frame_no, self.video_controller.total_frame_count - 1)
