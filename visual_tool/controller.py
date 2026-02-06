@@ -267,8 +267,11 @@ class MainWindow_controller(QMainWindow):
             self.ui.comboBox_ego_id.setCurrentIndex(next_index)
         else:
             self.ui.comboBox_ego_id.setCurrentIndex(0)
-        # 不要手動呼叫 update_label_checkboxes/update_agents_display/update_combobox_label_info
-        # 讓 currentIndexChanged 自動處理
+
+        self.video_controller.range_slider.setMinimum(0)
+        self.video_controller.setslidervalue(0)
+        self.video_controller.current_frame_no = 0
+
 
     def prev_actor(self):
         current_index = self.ui.comboBox_ego_id.currentIndex()
@@ -280,8 +283,10 @@ class MainWindow_controller(QMainWindow):
             self.ui.comboBox_ego_id.setCurrentIndex(prev_index)
         else:
             self.ui.comboBox_ego_id.setCurrentIndex(total - 1)
-        # 不要手動呼叫 update_label_checkboxes/update_agents_display/update_combobox_label_info
-        # 讓 currentIndexChanged 自動處理
+            
+        self.video_controller.range_slider.setMinimum(0)
+        self.video_controller.setslidervalue(0)
+        self.video_controller.current_frame_no = 0
 
     def set_label_button_selected(self, selected_idx):
         """
