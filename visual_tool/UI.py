@@ -76,6 +76,7 @@ class Ui_MainWindow(object):
         self.pushButton_check_label_done = QtWidgets.QPushButton(parent=self.centralwidget)
         self.pushButton_check_label_done.setGeometry(QtCore.QRect(1190, 70, 141, 51))
         self.pushButton_check_label_done.setObjectName("pushButton_check_label_done")
+        self.pushButton_range_expand_prev.setEnabled(False)
         self.pushButton_prev_actor = QtWidgets.QPushButton(parent=self.centralwidget)
         self.pushButton_prev_actor.setGeometry(QtCore.QRect(1190, 170, 150, 60))
         self.pushButton_prev_actor.setObjectName("pushButton_prev_actor")

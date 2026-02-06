@@ -48,12 +48,15 @@ class BaseVideoController(object):
     USE_SECONDARY_SLIDER = False  # 是否使用 secondary_slider
     BACKGROUND_FILENAME_TEMPLATE = "{DATA_ID}_background.png"  # 背景圖檔名模板
     DEFAULT_TIMER_INTERVAL = 30  # 預設 timer interval (ms)
+    
 
     def __init__(self, data_path, ui, DATA_ID):
+        self.debug_mode = False
+        
         self.data_path = data_path
         self.ui = ui
         self.DATA_ID = DATA_ID
-        self.debug = True
+        
 
         self.show_object_location_trigger = False
         self._onscreen_render_cache = {}
@@ -109,7 +112,7 @@ class BaseVideoController(object):
             self.trackid_class = orjson.loads(f.read())
 
         # 載入 track dict
-        if self.debug:
+        if self.debug_mode:
             with open(f'{self.data_path}/{self.DATA_ID}_track_frame_dict_mini.json', 'r', encoding='utf-8') as f:
                 self.track_dict = orjson.loads(f.read())
         else:
