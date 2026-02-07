@@ -853,5 +853,40 @@
     "min_frame": "12140",
     "max_frame": "12733",
     "label_idx": 0
+  },
+  "14_189": {
+    "ego_id": "14",
+    "actor_id": "189",
+    "min_frame": "1728",
+    "max_frame": "3087",
+    "label_idx": 7
+  },
+  "18_67": {
+    "ego_id": "18",
+    "actor_id": "67",
+    "min_frame": "0",
+    "max_frame": "1410",
+    "label_idx": 0
+  },
+  "18_75": {
+    "ego_id": "18",
+    "actor_id": "75",
+    "min_frame": "515",
+    "max_frame": "1410",
+    "label_idx": 0
+  },
+  "18_79": {
+    "ego_id": "18",
+    "actor_id": "79",
+    "min_frame": "0",
+    "max_frame": "1410",
+    "label_idx": 0
+  },
+  "18_51": {
+    "ego_id": "18",
+    "actor_id": "51",
+    "min_frame": "0",
+    "max_frame": "1410",
+    "label_idx": 0
   }
 }
