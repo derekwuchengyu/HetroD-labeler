@@ -7,6 +7,7 @@ import cv2
 import orjson
 import os
 from superqt import QRangeSlider
+from time import time
 import imageio
 
 from common_vars import DEBUG_MODE
@@ -583,3 +584,62 @@ class BaseVideoController(object):
             pass
 
         return frame
+
+def bind_common_shortcuts(window):
+    """讓主視窗能接收鍵盤事件"""
+    window.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+    window.setFocus()
+
+def common_keyPressEvent(window, event, ui, video_controller):
+    """
+    共用 keyPressEvent 處理函式。
+    回傳 True 表示已處理，False 表示未處理。
+    """
+    key = event.key()
+    handled = True
+    if key == Qt.Key.Key_A:
+        ui.pushButton_prev_actor.click()
+    elif key == Qt.Key.Key_D:
+        ui.pushButton_next_actor.click()
+    elif key == Qt.Key.Key_Space:
+        now = time()
+        if not hasattr(window, "_last_space_press_time"):
+            window._last_space_press_time = 0
+        double_click = (now - window._last_space_press_time) < 0.3
+        window._last_space_press_time = now
+        if hasattr(ui, "pushButton_play_or_stop"):
+            if double_click and hasattr(video_controller, "on_play_or_stop_double_clicked"):
+                video_controller.on_play_or_stop_double_clicked()
+            else:
+                ui.pushButton_play_or_stop.click()
+    elif key == Qt.Key.Key_Up:
+        combo = ui.comboBox_speed
+        speed_list = [combo.itemText(i) for i in range(combo.count())]
+        try:
+            idx = speed_list.index(combo.currentText())
+            if idx > 0:
+                combo.setCurrentText(speed_list[idx - 1])
+        except ValueError:
+            pass
+    elif key == Qt.Key.Key_Down:
+        combo = ui.comboBox_speed
+        speed_list = [combo.itemText(i) for i in range(combo.count())]
+        try:
+            idx = speed_list.index(combo.currentText())
+            if idx < len(speed_list) - 1:
+                combo.setCurrentText(speed_list[idx + 1])
+        except ValueError:
+            pass
+    elif key == Qt.Key.Key_Left:
+        if hasattr(video_controller, "current_frame_no"):
+            new_frame = max(0, video_controller.current_frame_no - 1)
+            video_controller.setslidervalue(new_frame)
+            video_controller.current_frame_no = new_frame
+    elif key == Qt.Key.Key_Right:
+        if hasattr(video_controller, "current_frame_no") and hasattr(video_controller, "total_frame_count"):
+            new_frame = min(video_controller.total_frame_count - 1, video_controller.current_frame_no + 1)
+            video_controller.setslidervalue(new_frame)
+            video_controller.current_frame_no = new_frame
+    else:
+        handled = False
+    return handled

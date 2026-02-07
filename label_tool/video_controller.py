@@ -49,6 +49,7 @@ class video_controller(BaseVideoController):
         self.total_frame_count = len(self.overlay_frame_list)
 
         self.ui.slider_videoframe.setRange(0, self.total_frame_count - 1)
+        self.secondary_slider.setRange(0, self.total_frame_count - 1)
         self.range_slider.setMinimum(0)
         self.range_slider.setMaximum(self.total_frame_count - 1)
         self.range_slider.setValue((0, self.total_frame_count - 1))
@@ -73,11 +74,13 @@ class video_controller(BaseVideoController):
                     self.range_slider.setValue((min_idx, max_idx))
                     self.current_frame_no = min_idx
                     self.ui.slider_videoframe.setValue(self.current_frame_no)
+                    self.secondary_slider.setValue(min_idx)
             except Exception:
                 pass
         else:
             self.current_frame_no = 0
-            self.ui.slider_videoframe.setValue(self.current_frame_no)
+            self.ui.slider_videoframe.setValue(0)
+            self.secondary_slider.setValue(0)
 
         frame = self.image_background.copy()
         self._onscreen_render_cache = {}

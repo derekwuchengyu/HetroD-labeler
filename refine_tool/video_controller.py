@@ -18,6 +18,7 @@ class video_controller(BaseVideoController):
     def get_speed_map(self):
         """Refine tool 的速度選單"""
         return {
+            "20": 20,
             "10": 10,
             "5": 5,
             "3": 3,
