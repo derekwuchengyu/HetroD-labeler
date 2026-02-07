@@ -888,5 +888,33 @@
     "min_frame": "0",
     "max_frame": "1410",
     "label_idx": 0
+  },
+  "31_189": {
+    "ego_id": "31",
+    "actor_id": "189",
+    "min_frame": "2216",
+    "max_frame": "2998",
+    "label_idx": 7
+  },
+  "39_180": {
+    "ego_id": "39",
+    "actor_id": "180",
+    "min_frame": "2488",
+    "max_frame": "3103",
+    "label_idx": 0
+  },
+  "39_189": {
+    "ego_id": "39",
+    "actor_id": "189",
+    "min_frame": "2484",
+    "max_frame": "3103",
+    "label_idx": 0
+  },
+  "43_42": {
+    "ego_id": "43",
+    "actor_id": "42",
+    "min_frame": "0",
+    "max_frame": "389",
+    "label_idx": 0
   }
 }
