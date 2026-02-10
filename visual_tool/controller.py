@@ -3,7 +3,7 @@ from zipfile import Path
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QMessageBox, QTableWidgetItem, QMainWindow, QProgressBar,
-    QCheckBox, QVBoxLayout, QGroupBox
+    QCheckBox, QVBoxLayout, QGroupBox, QPushButton
 )
 from PyQt6.QtGui import QIcon, QFont
 import pandas as pd
@@ -141,6 +141,9 @@ class MainWindow_controller(QMainWindow):
         self.video_controller = video_controller(data_path=self.data_path, ui=self.ui, DATA_ID=self.DATA_ID)
         # 綁定快捷鍵
         bind_common_shortcuts(self)
+
+        # 新增：toggle label 顯示按鈕
+        self.ui.pushButton_toggle_label.clicked.connect(self.video_controller.toggle_show_trackid_label)
 
         self.update_label_checkboxes()
         # 預設顯示所有 label 的 agents

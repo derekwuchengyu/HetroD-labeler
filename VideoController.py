@@ -62,6 +62,7 @@ class BaseVideoController(object):
         
 
         self.show_object_location_trigger = False
+        self.show_trackid_label = True  # 新增：預設顯示trackid label
         self._onscreen_render_cache = {}
         self._slider_updating = False
         
@@ -201,6 +202,12 @@ class BaseVideoController(object):
         self.show_object_location_trigger = not self.show_object_location_trigger
         self._update_label_frame(self.image_background.copy())
 
+    def toggle_show_trackid_label(self):
+        """切換是否顯示trackid label"""
+        print("切換顯示 trackid label:", not self.show_trackid_label)
+        self.show_trackid_label = not self.show_trackid_label
+        self._update_label_frame(self.image_background.copy())
+
     def update_play_or_stop_button_text(self):
         """更新播放/停止按鈕文字"""
         if self.videoplayer_state == "play":
@@ -253,6 +260,34 @@ class BaseVideoController(object):
         self.ui.label_videoframe.setPixmap(self.qpixmap)
         self.ui.label_videoframe.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignVCenter)
 
+    @staticmethod
+    def draw_label_with_style(frame, label, x, y, font_scale=0.7, thickness=2):
+        """
+        在 (x, y) 位置以黑匡黑字白底方式繪製 label
+        """
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        text_size, baseline = cv2.getTextSize(label, font, font_scale, thickness)
+        text_x = int(x - text_size[0] // 2)
+        text_y = int(y)
+        # 畫白底
+        cv2.rectangle(
+            frame,
+            (text_x - 4, text_y - text_size[1] - 4),
+            (text_x + text_size[0] + 4, text_y + baseline + 4),
+            (255, 255, 255),
+            thickness=-1
+        )
+        # 畫黑色文字邊框
+        cv2.rectangle(
+            frame,
+            (text_x - 4, text_y - text_size[1] - 6),
+            (text_x + text_size[0] + 4, text_y + baseline + 2),
+            (0, 0, 0),
+            thickness=2
+        )
+        # 畫黑色文字
+        cv2.putText(frame, label, (text_x, text_y), font, font_scale, (0,0,0), thickness, cv2.LINE_AA)
+
     def _update_label_onscreen(self, frame):
         """更新畫面上的標籤 - 使用快取機制"""
         current_ego_id = self.current_ego_id
@@ -278,13 +313,17 @@ class BaseVideoController(object):
 
         # 繪製 ego bbox
         try:
-            row = self.track_dict[current_ego_id][current_frame][0]
+            row = self.track_dict[self.current_ego_id][current_frame][0]
             x = row['xCenter'] / ortho_px_to_meter
             y = -row['yCenter'] / ortho_px_to_meter
             heading = row['heading']
             width = row['width'] / ortho_px_to_meter
             length = row['length'] / ortho_px_to_meter
             draw_rotated_bbox(frame, x, y, width, length, heading)
+            if self.show_trackid_label:
+                label = str(self.current_ego_id)
+                text_y = int(y - height_offset(width, length, heading)) - 10
+                BaseVideoController.draw_label_with_style(frame, label, x, text_y)
         except:
             pass
 
@@ -302,15 +341,23 @@ class BaseVideoController(object):
                     color = (255, 0, 0) if actor_class != "pedestrian" else (255, 0, 255)
                     if actor_class == "pedestrian":
                         cv2.circle(frame, (int(x), int(y)), 15, color, thickness=-1)
+                        if self.show_trackid_label:
+                            label = str(aid)
+                            text_y = int(y) - 20
+                            BaseVideoController.draw_label_with_style(frame, label, x, text_y)
                     else:
                         draw_rotated_bbox(frame, x, y, width, length, heading, color=color)
+                        if self.show_trackid_label:
+                            label = str(aid)
+                            text_y = int(y - height_offset(width, length, heading)) - 10
+                            BaseVideoController.draw_label_with_style(frame, label, x, text_y)
                 except:
                     pass
 
         # 繪製 other actor bbox
-        other_actor_class = self.trackid_class.get(str(current_other_actor_id), "unknown")
+        other_actor_class = self.trackid_class.get(str(self.current_other_actor_id), "unknown")
         try:
-            row = self.track_dict[current_other_actor_id][current_frame][0]
+            row = self.track_dict[self.current_other_actor_id][current_frame][0]
             x = row['xCenter'] / ortho_px_to_meter
             y = -row['yCenter'] / ortho_px_to_meter
             heading = row['heading']
@@ -319,8 +366,16 @@ class BaseVideoController(object):
 
             if other_actor_class == "pedestrian":
                 cv2.circle(frame, (int(x), int(y)), 15, (255, 0, 0), thickness=-1)
+                if self.show_trackid_label:
+                    label = str(self.current_other_actor_id)
+                    text_y = int(y) - 20
+                    BaseVideoController.draw_label_with_style(frame, label, x, text_y)
             else:
                 draw_rotated_bbox(frame, x, y, width, length, heading, color=(255,0,0))
+                if self.show_trackid_label:
+                    label = str(self.current_other_actor_id)
+                    text_y = int(y - height_offset(width, length, heading)) - 10
+                    BaseVideoController.draw_label_with_style(frame, label, x, text_y)
 
             if self.show_object_location_trigger:
                 cv2.circle(frame, (int(x), int(y)), 80, (0, 0, 255), thickness=10)
@@ -643,3 +698,8 @@ def common_keyPressEvent(window, event, ui, video_controller):
     else:
         handled = False
     return handled
+
+# 輔助函數：根據 heading 計算 bbox 上方的 offset
+def height_offset(width, length, heading):
+    # 取最大邊長作為 offset，heading 角度不影響高度
+    return max(width, length) / 2 + 10

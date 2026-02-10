@@ -97,7 +97,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton_show_object_location">
+   <widget class="QPushButton" name="pushButton_toggle_label">
     <property name="geometry">
      <rect>
       <x>1390</x>
@@ -107,7 +107,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>顯示 Actor 位置</string>
+     <string>顯示 Actor Id</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_next_actor">
@@ -592,7 +592,7 @@
    <zorder>slider_videoframe_label</zorder>
    <zorder>pushButton_play_or_stop</zorder>
    <zorder>verticalLayoutWidget</zorder>
-   <zorder>pushButton_show_object_location</zorder>
+   <zorder>pushButton_toggle_label</zorder>
    <zorder>pushButton_next_actor</zorder>
    <zorder>pushButton_label_notice_on</zorder>
    <zorder>comboBox_speed</zorder>
