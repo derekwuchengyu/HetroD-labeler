@@ -17,10 +17,10 @@ sys.path.append('../')
 from VideoController import bind_common_shortcuts, common_keyPressEvent
 from common_vars import (
     DATA_PATH, 
-    MAX_LABEL_IDX, 
     MOTOR_BIKE_LABELS,
     CAR_TRUCK_LABELS,
-    PED_LABELS
+    PED_LABELS,
+    LABEL_BUTTON_LIST
 )
 # python -m PyQt6.uic.pyuic label.ui -o UI.py
 
@@ -44,11 +44,11 @@ class MainWindow_controller(QMainWindow):
 
         self.data_path = DATA_PATH
         self.DATA_ID = DATA_ID
-        self.MAX_LABEL_IDX = MAX_LABEL_IDX
 
         self.motor_bike_labels = MOTOR_BIKE_LABELS
         self.car_truck_labels = CAR_TRUCK_LABELS
         self.ped_labels = PED_LABELS
+        self.label_button_list = LABEL_BUTTON_LIST
         
         print(f"Loading track #{self.DATA_ID} data...")
         # we load the dict for ego id and object id list
@@ -112,7 +112,7 @@ class MainWindow_controller(QMainWindow):
 
 
         # 設定 label 按鈕點擊事件
-        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
+        for i in self.label_button_list:
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
@@ -620,7 +620,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(self.ped_labels)
 
-        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -693,7 +693,7 @@ class MainWindow_controller(QMainWindow):
 
         # 3. 更新 UI 按鈕顏色
         blue_labels = valid_indices - {99}
-        for i in list(range(0, self.MAX_LABEL_IDX + 1)) + [88]:
+        for i in self.label_button_list:
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 if i == self.selected_label_idx:

@@ -18,7 +18,7 @@ import platform
 
 sys.path.append('../')
 from VideoController import bind_common_shortcuts, common_keyPressEvent
-from common_vars import DATA_PATH, MAX_LABEL_IDX
+from common_vars import DATA_PATH, LABEL_BUTTON_LIST 
 #  python -m PyQt6.uic.pyuic label.ui -o UI.py
 
 
@@ -29,7 +29,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.setupUi(self)
 
         # 設定要篩選的 label_idx 值
-        self.MAX_LABEL_IDX = MAX_LABEL_IDX
+        self.label_button_list = LABEL_BUTTON_LIST
         self.MAX_ACTORS_PER_EGO = 100
         self.MAX_FRAME_RANGE = 9000
 
@@ -153,7 +153,7 @@ class MainWindow_controller(QMainWindow):
         self.update_agents_display()
 
         # 設定 label 按鈕點擊事件
-        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
 
@@ -201,7 +201,7 @@ class MainWindow_controller(QMainWindow):
         ego_id = self.ui.comboBox_ego_id.currentText()
         contain_labels = list(self.unique_ego[ego_id].keys())
 
-        for i in range(0, self.MAX_LABEL_IDX + 1):
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i in self.show_label:
                 btn.setStyleSheet("color: red;")
@@ -326,7 +326,7 @@ class MainWindow_controller(QMainWindow):
         self.update_agents_display()
 
         # 更新 UI 按鈕顏色
-        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i in self.show_label:
                 btn.setStyleSheet("color: red;")
@@ -414,7 +414,7 @@ class MainWindow_controller(QMainWindow):
         # 同步 label button 顏色
         ego_id = self.ui.comboBox_ego_id.currentText()
         contain_labels = list(self.unique_ego[ego_id].keys())
-        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i in self.show_label:
                 btn.setStyleSheet("color: red;")

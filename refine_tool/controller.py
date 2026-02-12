@@ -17,10 +17,10 @@ sys.path.append('../')
 from VideoController import bind_common_shortcuts, common_keyPressEvent
 from common_vars import (
     DATA_PATH, 
-    MAX_LABEL_IDX, 
     MOTOR_BIKE_LABELS,
     CAR_TRUCK_LABELS,
-    PED_LABELS
+    PED_LABELS,
+    LABEL_BUTTON_LIST
 )
 #  python -m PyQt6.uic.pyuic label.ui -o UI.py
 
@@ -33,12 +33,11 @@ class MainWindow_controller(QMainWindow):
 
         # 設定要篩選的 label_idx 值
         self.LABEL_IDX = LABEL_IDX
-        self.MAX_LABEL_IDX = MAX_LABEL_IDX
 
         self.motor_bike_labels = MOTOR_BIKE_LABELS
         self.car_truck_labels = CAR_TRUCK_LABELS
         self.ped_labels = PED_LABELS
-
+        self.label_button_list = LABEL_BUTTON_LIST
         # 根據 UI 模組決定 ToolTip 字體大小
         
         if "ui_ipad_mini" in ui_class.__module__.lower():
@@ -116,7 +115,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
         # 設定 label 按鈕點擊事件
-        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
         
@@ -238,7 +237,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(self.ped_labels)
 
-        for i in range(0, self.MAX_LABEL_IDX + 1):
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -367,7 +366,7 @@ class MainWindow_controller(QMainWindow):
             # self.selected_label_idx_99 = False  # 重置 99 flag
 
         # 更新 UI 按鈕顏色
-        for i in list(range(0, self.MAX_LABEL_IDX+1))+[88]:
+        for i in self.label_button_list:
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
