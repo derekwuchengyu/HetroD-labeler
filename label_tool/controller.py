@@ -771,9 +771,9 @@ class MainWindow_controller(QMainWindow):
                 try:
                     content = orjson.loads(f.read())
                 except Exception:
-                    content = {}
+                    content = [] if path.endswith("_ego_done.json") else {}
         else:
-            content = {}
+            content = [] if path.endswith("_ego_done.json") else {}
         return content
 
     def _save_to_json(self, file_name, key, data):

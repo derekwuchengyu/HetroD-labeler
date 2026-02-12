@@ -10,7 +10,7 @@ def main():
                         help='Choose UI layout: default or ipad')
     parser.add_argument('--data_id', '-id',
                         type=str,
-                        default='01',
+                        default='18',
                         help='Specify the DATA_ID to use')
     
     args = parser.parse_args()
