@@ -29,7 +29,7 @@ class MainWindow_controller(QMainWindow):
     # 檔案快取
     _file_cache = {}
 
-    def __init__(self, ui_class, DATA_ID='01'):
+    def __init__(self, ui_class, DATA_ID='18'):
         super().__init__() 
         self.ui = ui_class()  # 使用傳入的 UI 類別
         self.ui.setupUi(self)
