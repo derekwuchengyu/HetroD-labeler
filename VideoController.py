@@ -32,7 +32,8 @@ def draw_rotated_bbox(img, x, y, width, length, heading, color=(0,255,0), thickn
     cv2.fillPoly(img, [box], color=color)
 
 
-ortho_px_to_meter = 0.0499967249445942
+
+#if DATA_INDEX == "18" set other value: 0.0499967249445942
 
 
 class DoubleClickButton(QPushButton):
@@ -52,6 +53,13 @@ class BaseVideoController(object):
     BACKGROUND_FILENAME_TEMPLATE = "{DATA_ID}_background.png"  # 背景圖檔名模板
     DEFAULT_TIMER_INTERVAL = 30  # 預設 timer interval (ms)
     
+    # 資料集對應的 scale_down_factor（與 visualizer_params.json 一致）
+    DATASET_META = {
+        "taiwan_urban": {"ortho_px_to_meter": 0.0499967249445942, "scale_down_factor": 1},
+        "fifd": {"ortho_px_to_meter": 0.0499967249445942, "scale_down_factor": 1},
+        "ind": {"ortho_px_to_meter": 0.00814636091724502, "scale_down_factor": 12},
+    }
+
 
     def __init__(self, data_path, ui, DATA_ID):
         self.debug_mode = DEBUG_MODE
@@ -59,6 +67,18 @@ class BaseVideoController(object):
         self.data_path = data_path
         self.ui = ui
         self.DATA_ID = DATA_ID
+        
+        # 根據 DATA_ID 設定像素到公尺的轉換率與 scale_down_factor
+        # 預設值 (taiwan_urban)
+
+        self.dataset_type = "taiwan_urban"
+        if self.DATA_ID == "18":
+            self.dataset_type = "ind"
+
+        self.ortho_px_to_meter = self.DATASET_META.get(self.dataset_type, {}).get("ortho_px_to_meter", 0.0499967249445942)
+        self.scale_down_factor = self.DATASET_META.get(self.dataset_type, {}).get("scale_down_factor", 1)
+            
+
         
 
         self.show_object_location_trigger = False
@@ -249,9 +269,12 @@ class BaseVideoController(object):
         else:
             self.abs_frame_no = 0
 
+        # 根據圖片尺寸調整字體大小
+        font_scale = max(0.4, min(self.image_width, self.image_height) / 1920.0)
+        
         cv2.putText(
             frame, f"Frame: {self.abs_frame_no + 1}",
-            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1,
+            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, font_scale,
             (255, 255, 255), 2, cv2.LINE_AA
         )
 
@@ -310,21 +333,28 @@ class BaseVideoController(object):
             return frame
 
         current_frame = self.overlay_frame_list[self.current_frame_no]
+        
+        # 座標轉換公式：pixel = meter / ortho_px_to_meter / scale_down_factor
+        # 與 track_visualizer 中 centerVis / scale_down_factor 等價
+        sdf = self.scale_down_factor
 
         # 繪製 ego bbox
         try:
             row = self.track_dict[self.current_ego_id][current_frame][0]
-            x = row['xCenter'] / ortho_px_to_meter
-            y = -row['yCenter'] / ortho_px_to_meter
+            x = row['xCenter'] / self.ortho_px_to_meter / sdf
+            y = -row['yCenter'] / self.ortho_px_to_meter / sdf
             heading = row['heading']
-            width = row['width'] / ortho_px_to_meter
-            length = row['length'] / ortho_px_to_meter
+            width = row['width'] / self.ortho_px_to_meter / sdf
+            length = row['length'] / self.ortho_px_to_meter / sdf
+            
             draw_rotated_bbox(frame, x, y, width, length, heading)
             if self.show_trackid_label:
                 label = str(self.current_ego_id)
                 text_y = int(y - height_offset(width, length, heading)) - 10
                 BaseVideoController.draw_label_with_style(frame, label, x, text_y)
-        except:
+        except Exception as e:
+            if self.debug_mode:
+                print(f"DEBUG: ego bbox failed - {e}")
             pass
 
         # 多 agent 顯示（如果 current_agent_ids 有內容就畫）
@@ -332,15 +362,15 @@ class BaseVideoController(object):
             for aid in self.current_agent_ids:
                 try:
                     row = self.track_dict[aid][current_frame][0]
-                    x = row['xCenter'] / ortho_px_to_meter
-                    y = -row['yCenter'] / ortho_px_to_meter
+                    x = row['xCenter'] / self.ortho_px_to_meter / sdf
+                    y = -row['yCenter'] / self.ortho_px_to_meter / sdf
                     heading = row['heading']
-                    width = row['width'] / ortho_px_to_meter
-                    length = row['length'] / ortho_px_to_meter
+                    width = row['width'] / self.ortho_px_to_meter / sdf
+                    length = row['length'] / self.ortho_px_to_meter / sdf
                     actor_class = self.trackid_class.get(str(aid), "unknown")
                     color = (255, 0, 0) if actor_class != "pedestrian" else (255, 0, 255)
                     if actor_class == "pedestrian":
-                        cv2.circle(frame, (int(x), int(y)), 15, color, thickness=-1)
+                        cv2.circle(frame, (int(x), int(y)), max(2, int(15 / sdf)), color, thickness=-1)
                         if self.show_trackid_label:
                             label = str(aid)
                             text_y = int(y) - 20
@@ -351,21 +381,23 @@ class BaseVideoController(object):
                             label = str(aid)
                             text_y = int(y - height_offset(width, length, heading)) - 10
                             BaseVideoController.draw_label_with_style(frame, label, x, text_y)
-                except:
+                except Exception as e:
+                    if self.debug_mode:
+                        print(f"DEBUG: agent {aid} bbox failed - {e}")
                     pass
 
         # 繪製 other actor bbox
         other_actor_class = self.trackid_class.get(str(self.current_other_actor_id), "unknown")
         try:
             row = self.track_dict[self.current_other_actor_id][current_frame][0]
-            x = row['xCenter'] / ortho_px_to_meter
-            y = -row['yCenter'] / ortho_px_to_meter
+            x = row['xCenter'] / self.ortho_px_to_meter / sdf
+            y = -row['yCenter'] / self.ortho_px_to_meter / sdf
             heading = row['heading']
-            width = row['width'] / ortho_px_to_meter
-            length = row['length'] / ortho_px_to_meter
+            width = row['width'] / self.ortho_px_to_meter / sdf
+            length = row['length'] / self.ortho_px_to_meter / sdf
 
             if other_actor_class == "pedestrian":
-                cv2.circle(frame, (int(x), int(y)), 15, (255, 0, 0), thickness=-1)
+                cv2.circle(frame, (int(x), int(y)), max(2, int(15 / sdf)), (255, 0, 0), thickness=-1)
                 if self.show_trackid_label:
                     label = str(self.current_other_actor_id)
                     text_y = int(y) - 20
@@ -378,7 +410,7 @@ class BaseVideoController(object):
                     BaseVideoController.draw_label_with_style(frame, label, x, text_y)
 
             if self.show_object_location_trigger:
-                cv2.circle(frame, (int(x), int(y)), 80, (0, 0, 255), thickness=10)
+                cv2.circle(frame, (int(x), int(y)), max(10, int(80 / sdf)), (0, 0, 255), thickness=max(2, int(10 / sdf)))
         except:
             pass
 
@@ -610,14 +642,15 @@ class BaseVideoController(object):
         current_frame = self.overlay_frame_list[frame_no]
         current_ego_id = self.current_ego_id
         current_other_actor_id = self.current_other_actor_id
+        sdf = self.scale_down_factor
 
         try:
             row = self.track_dict[current_ego_id][current_frame][0]
-            x = row['xCenter'] / ortho_px_to_meter
-            y = -row['yCenter'] / ortho_px_to_meter
+            x = row['xCenter'] / self.ortho_px_to_meter / sdf
+            y = -row['yCenter'] / self.ortho_px_to_meter / sdf
             heading = row['heading']
-            width = row['width'] / ortho_px_to_meter
-            length = row['length'] / ortho_px_to_meter
+            width = row['width'] / self.ortho_px_to_meter / sdf
+            length = row['length'] / self.ortho_px_to_meter / sdf
             draw_rotated_bbox(frame, x, y, width, length, heading)
         except:
             pass
@@ -625,14 +658,14 @@ class BaseVideoController(object):
         other_actor_class = self.trackid_class.get(str(current_other_actor_id), "unknown")
         try:
             row = self.track_dict[current_other_actor_id][current_frame][0]
-            x = row['xCenter'] / ortho_px_to_meter
-            y = -row['yCenter'] / ortho_px_to_meter
+            x = row['xCenter'] / self.ortho_px_to_meter / sdf
+            y = -row['yCenter'] / self.ortho_px_to_meter / sdf
             heading = row['heading']
-            width = row['width'] / ortho_px_to_meter
-            length = row['length'] / ortho_px_to_meter
+            width = row['width'] / self.ortho_px_to_meter / sdf
+            length = row['length'] / self.ortho_px_to_meter / sdf
 
             if other_actor_class == "pedestrian":
-                cv2.circle(frame, (int(x), int(y)), 15, (255, 0, 0), thickness=-1)
+                cv2.circle(frame, (int(x), int(y)), max(2, int(15 / sdf)), (255, 0, 0), thickness=-1)
             else:
                 draw_rotated_bbox(frame, x, y, width, length, heading, color=(255,0,0))
         except:
