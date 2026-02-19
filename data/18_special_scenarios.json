@@ -1,0 +1,18 @@
+{
+  "5_401": {
+    "ego_id": "5",
+    "actor_id": "401",
+    "min_frame": "26268",
+    "max_frame": "27990",
+    "label_idx": null,
+    "timestamp": "2026-02-18 17:02:27"
+  },
+  "9_401": {
+    "ego_id": "9",
+    "actor_id": "401",
+    "min_frame": "26268",
+    "max_frame": "27990",
+    "label_idx": null,
+    "timestamp": "2026-02-18 17:35:04"
+  }
+}

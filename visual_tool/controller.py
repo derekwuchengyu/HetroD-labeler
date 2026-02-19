@@ -17,9 +17,11 @@ import platform
 # from pathlib import Path
 
 sys.path.append('../')
-from VideoController import bind_common_shortcuts, common_keyPressEvent
-from common_vars import DATA_PATH, LABEL_BUTTON_LIST 
-#  python -m PyQt6.uic.pyuic label.ui -o UI.py
+from base_video_controller import bind_common_shortcuts, common_keyPressEvent, setup_scenario_buttons
+from common_vars import (
+    DATA_PATH,
+    LABEL_BUTTON_TEXTS,
+)
 
 
 class MainWindow_controller(QMainWindow):
@@ -29,7 +31,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.setupUi(self)
 
         # 設定要篩選的 label_idx 值
-        self.label_button_list = LABEL_BUTTON_LIST
+        self.label_button_dict = LABEL_BUTTON_TEXTS
         self.MAX_ACTORS_PER_EGO = 100
         self.MAX_FRAME_RANGE = 9000
 
@@ -45,6 +47,10 @@ class MainWindow_controller(QMainWindow):
         self.DATA_ID = DATA_ID
 
         self.show_label = set()
+
+        # 動態產生 scenario 按鈕（共用 function）
+        setup_scenario_buttons(self.ui, self.label_button_dict, self.set_label_button_selected)
+
 
         print(f"Loading track #{self.DATA_ID} data...")
         start_time = time()
@@ -153,7 +159,7 @@ class MainWindow_controller(QMainWindow):
         self.update_agents_display()
 
         # 設定 label 按鈕點擊事件
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
 
@@ -201,7 +207,7 @@ class MainWindow_controller(QMainWindow):
         ego_id = self.ui.comboBox_ego_id.currentText()
         contain_labels = list(self.unique_ego[ego_id].keys())
 
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i in self.show_label:
                 btn.setStyleSheet("color: red;")
@@ -326,7 +332,7 @@ class MainWindow_controller(QMainWindow):
         self.update_agents_display()
 
         # 更新 UI 按鈕顏色
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i in self.show_label:
                 btn.setStyleSheet("color: red;")
@@ -414,7 +420,7 @@ class MainWindow_controller(QMainWindow):
         # 同步 label button 顏色
         ego_id = self.ui.comboBox_ego_id.currentText()
         contain_labels = list(self.unique_ego[ego_id].keys())
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i in self.show_label:
                 btn.setStyleSheet("color: red;")

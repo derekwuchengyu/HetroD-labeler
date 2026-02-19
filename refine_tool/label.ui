@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1680</width>
+    <width>1745</width>
     <height>822</height>
    </rect>
   </property>
@@ -100,7 +100,7 @@
    <widget class="QPushButton" name="pushButton_show_object_location">
     <property name="geometry">
      <rect>
-      <x>1390</x>
+      <x>1379</x>
       <y>522</y>
       <width>110</width>
       <height>38</height>
@@ -113,7 +113,7 @@
    <widget class="QPushButton" name="pushButton_next_actor">
     <property name="geometry">
      <rect>
-      <x>1350</x>
+      <x>1339</x>
       <y>170</y>
       <width>150</width>
       <height>60</height>
@@ -126,7 +126,7 @@
    <widget class="QPushButton" name="pushButton_label_notice_on">
     <property name="geometry">
      <rect>
-      <x>1390</x>
+      <x>1379</x>
       <y>480</y>
       <width>110</width>
       <height>38</height>
@@ -156,13 +156,15 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#5aa6ff;&quot;&gt;Speed: &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;
+                        color:#5aa6ff;&quot;&gt;Speed:
+                        &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_make_video_gif">
     <property name="geometry">
      <rect>
-      <x>1390</x>
+      <x>1379</x>
       <y>564</y>
       <width>111</width>
       <height>38</height>
@@ -175,7 +177,7 @@
    <widget class="QPushButton" name="pushButton_label_88">
     <property name="geometry">
      <rect>
-      <x>1364</x>
+      <x>1354</x>
       <y>660</y>
       <width>144</width>
       <height>51</height>
@@ -188,7 +190,7 @@
    <widget class="QComboBox" name="comboBox_ego_id">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>1179</x>
       <y>20</y>
       <width>231</width>
       <height>51</height>
@@ -198,7 +200,7 @@
    <widget class="QLabel" name="label_combobox_ego_id">
     <property name="geometry">
      <rect>
-      <x>1430</x>
+      <x>1419</x>
       <y>20</y>
       <width>80</width>
       <height>39</height>
@@ -217,7 +219,7 @@
    <widget class="QTableWidget" name="tableWidget_label_info">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>1179</x>
       <y>240</y>
       <width>311</width>
       <height>231</height>
@@ -227,7 +229,7 @@
    <widget class="QPushButton" name="pushButton_check_label_done">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>1179</x>
       <y>70</y>
       <width>141</width>
       <height>51</height>
@@ -240,7 +242,7 @@
    <widget class="QPushButton" name="pushButton_prev_actor">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>1179</x>
       <y>170</y>
       <width>150</width>
       <height>60</height>
@@ -253,7 +255,7 @@
    <widget class="QPushButton" name="pushButton_label_99">
     <property name="geometry">
      <rect>
-      <x>1364</x>
+      <x>1354</x>
       <y>710</y>
       <width>144</width>
       <height>51</height>
@@ -266,7 +268,7 @@
    <widget class="QPushButton" name="pushButton_special_scenario">
     <property name="geometry">
      <rect>
-      <x>1364</x>
+      <x>1354</x>
       <y>760</y>
       <width>144</width>
       <height>51</height>
@@ -276,259 +278,21 @@
      <string>特別Scenario(含違規)</string>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>1520</x>
-      <y>11</y>
-      <width>152</width>
-      <height>801</height>
+      <x>1503</x>
+      <y>6</y>
+      <width>240</width>
+      <height>811</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QPushButton" name="pushButton_label_0">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>None</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_1">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:24pt;&quot;&gt;Ego 路口直行，遇到對向車左轉 &lt;br/&gt;{Car, Truck, Motor/Bike} &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>直行 + 左轉</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_2">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>左轉 + 直行</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_3">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>並行( 機車加速超越)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_4">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>並行( 機車等速並行)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_5">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>並行( 機車減速被超)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_6">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>繞過前方車輛</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_7">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>被 右側 cut-in</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_8">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>被 左側 cut-in</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_9">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>右轉 + 機車直行/待轉</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_10">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>左轉 + 待轉機車</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_15">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>左轉 + 左側機車通過</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_11">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>右轉 + 行人通過</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_12">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>左轉 ＋ 行人通過</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_13">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>cut-out + 右側直行</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_14">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>cut-out + 左側直行</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_16">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>ego 跟車</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_label_77">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>其他</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <layout class="QGridLayout" name="verticalLayout_2"/>
    </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>1190</x>
+      <x>1179</x>
       <y>478</y>
       <width>191</width>
       <height>111</height>
@@ -596,7 +360,7 @@
      <string>End</string>
     </property>
    </widget>
-   <zorder>layoutWidget</zorder>
+   <zorder>widget</zorder>
    <zorder>label_3</zorder>
    <zorder>label_videoframe</zorder>
    <zorder>slider_videoframe_label</zorder>

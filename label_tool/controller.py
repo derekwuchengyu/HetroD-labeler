@@ -1,4 +1,5 @@
-from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow
+from curses import window
+from PyQt6.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QPushButton, QVBoxLayout
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtCore import Qt
 
@@ -14,13 +15,13 @@ import base64
 from pathlib import Path
 
 sys.path.append('../')
-from VideoController import bind_common_shortcuts, common_keyPressEvent
+from base_video_controller import bind_common_shortcuts, common_keyPressEvent, setup_scenario_buttons
 from common_vars import (
     DATA_PATH, 
     MOTOR_BIKE_LABELS,
     CAR_TRUCK_LABELS,
     PED_LABELS,
-    LABEL_BUTTON_LIST
+    LABEL_BUTTON_TEXTS,
 )
 # python -m PyQt6.uic.pyuic label.ui -o UI.py
 
@@ -48,7 +49,10 @@ class MainWindow_controller(QMainWindow):
         self.motor_bike_labels = MOTOR_BIKE_LABELS
         self.car_truck_labels = CAR_TRUCK_LABELS
         self.ped_labels = PED_LABELS
-        self.label_button_list = LABEL_BUTTON_LIST
+        self.label_button_dict = LABEL_BUTTON_TEXTS
+
+        # 動態產生 scenario 按鈕（共用 function）
+        setup_scenario_buttons(self.ui, self.label_button_dict, self.set_label_button_selected)
         
         print(f"Loading track #{self.DATA_ID} data...")
         # we load the dict for ego id and object id list
@@ -111,8 +115,10 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
 
+
+
         # 設定 label 按鈕點擊事件
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
@@ -527,7 +533,7 @@ class MainWindow_controller(QMainWindow):
             min_distance = self.pet_min_distance_dict[key].get("min_distance", None)
             pet = self.pet_min_distance_dict[key].get("pet", None)
         # 判斷 pet 是否為 1000000
-        pet_str = "inf" if pet == 1000000 else (pet if pet is not None else "N/A")
+        pet_str = "inf" if pet >= 1000000 else (pet if pet is not None else "N/A")
 
         def format_float(val):
             return f"{val:.2f}" if isinstance(val, (float, int)) and val is not None else "N/A"
@@ -540,8 +546,8 @@ class MainWindow_controller(QMainWindow):
             ("Min Distance", format_float(min_distance)),
             ("PET", f"{format_float(pet) if pet_str != 'inf' else 'inf'}\n"),
 
-            ("min distance range", f"{format_float(self.min_distance_range[0])} - {format_float(self.min_distance_range[1])}"),
-            ("min pet range", f"{format_float(self.pet_range[0])} - {format_float(self.pet_range[1])}")
+            ("Min-Distance rng", f"{format_float(self.min_distance_range[0])} - {format_float(self.min_distance_range[1])}"),
+            ("PET range", f"{format_float(self.pet_range[0])} - {format_float(self.pet_range[1])}")
         ]
 
         # 設定 tableWidget 行數與列數
@@ -555,7 +561,7 @@ class MainWindow_controller(QMainWindow):
         if "ui_ipad_mini" in self.ui.__module__.lower():
             font.setPointSize(10)
         else:
-            font.setPointSize(16)
+            font.setPointSize(13)
 
         # 填入資料
         for row, (label, value) in enumerate(data):
@@ -565,6 +571,8 @@ class MainWindow_controller(QMainWindow):
             item_value.setFont(font)
             self.ui.tableWidget_label_info.setItem(row, 0, item_label)
             self.ui.tableWidget_label_info.setItem(row, 1, item_value)
+        self.ui.tableWidget_label_info.setColumnWidth(0, 160)
+        self.ui.tableWidget_label_info.setColumnWidth(1, 120)
 
 
         # 取得 ego_id 與 actor_id
@@ -620,7 +628,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(self.ped_labels)
 
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -643,6 +651,11 @@ class MainWindow_controller(QMainWindow):
         if next_index < total:
             self.ui.comboBox_other_actor_id.setCurrentIndex(next_index)
         else:
+            QMessageBox.information(
+                self,
+                "Information",
+                "Actor list reached the end."
+            )
             self.ui.comboBox_other_actor_id.setCurrentIndex(0)
 
         
@@ -693,7 +706,7 @@ class MainWindow_controller(QMainWindow):
 
         # 3. 更新 UI 按鈕顏色
         blue_labels = valid_indices - {99}
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
                 if i == self.selected_label_idx:
@@ -733,6 +746,9 @@ class MainWindow_controller(QMainWindow):
 
         # 7. 更新按鈕顏色
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
+
+        # 自動跳下一個
+        self.ui.pushButton_next_actor.click()
 
     def mark_special_scenario(self):
         self.click_time()

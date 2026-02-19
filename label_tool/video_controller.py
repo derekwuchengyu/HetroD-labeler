@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from VideoController import BaseVideoController
+from base_video_controller import BaseVideoController
 import orjson
 
 
@@ -15,6 +15,19 @@ class video_controller(BaseVideoController):
     def __init__(self, data_path, ui, DATA_ID):
         super().__init__(data_path, ui, DATA_ID)
 
+    def get_speed_map(self):
+        """Refine tool 的速度選單"""
+        return {
+            "50": 50,
+            "40": 40,
+            "30": 30,
+            "20": 20,
+            "10": 10,
+            "5": 5,
+            "3": 3,
+            "2": 2,
+            "1": 1,
+        }
 
     def update_video_info(self):
         """更新視訊資訊 - label_tool 專用邏輯"""

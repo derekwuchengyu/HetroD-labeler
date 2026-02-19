@@ -1,7 +1,7 @@
 from PyQt6 import QtCore
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import QTimer, Qt
-from PyQt6.QtWidgets import QSlider, QPushButton, QMessageBox, QFileDialog
+from PyQt6.QtWidgets import QSlider, QPushButton, QMessageBox, QFileDialog, QSizePolicy
 import numpy as np
 import cv2
 import orjson
@@ -10,7 +10,9 @@ from superqt import QRangeSlider
 from time import time
 import imageio
 
-from common_vars import DEBUG_MODE
+from common_vars import (
+    DEBUG_MODE,
+)
 
 
 def draw_rotated_bbox(img, x, y, width, length, heading, color=(0,255,0), thickness=2):
@@ -689,7 +691,7 @@ def common_keyPressEvent(window, event, ui, video_controller):
         ui.pushButton_prev_actor.click()
     elif key == Qt.Key.Key_D:
         ui.pushButton_next_actor.click()
-    elif key == Qt.Key.Key_Space:
+    elif key == Qt.Key.Key_P:
         now = time()
         if not hasattr(window, "_last_space_press_time"):
             window._last_space_press_time = 0
@@ -736,3 +738,38 @@ def common_keyPressEvent(window, event, ui, video_controller):
 def height_offset(width, length, heading):
     # 取最大邊長作為 offset，heading 角度不影響高度
     return max(width, length) / 2 + 10
+
+
+def setup_scenario_buttons(ui, label_button_dict, set_label_button_selected):
+    """
+    動態產生 scenario 按鈕，加入 ui.verticalLayout_2。
+    須依據 LABEL_BUTTON_LIST, LABEL_BUTTON_TEXTS 設定。
+    ui: UI instance
+    label_button_dict: list of label indices
+    set_label_button_selected: callback function(idx)
+    """
+    layout = ui.verticalLayout_2
+    # 先清空 layout
+    while layout.count():
+        item = layout.takeAt(0)
+        widget = item.widget()
+        if widget is not None:
+            widget.deleteLater()
+
+    # 動態建立按鈕
+    col_count = 2
+    # total = len(label_button_dict.keys())
+    row_count = 17
+    for idx, label_idx in enumerate(label_button_dict.keys()):
+        btn = QPushButton(label_button_dict.get(label_idx, f"Label {label_idx}"))
+        btn.setObjectName(f"pushButton_label_{label_idx}")
+        btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        btn.clicked.connect(lambda checked, i=label_idx: set_label_button_selected(i))
+        # 讓兩欄平均分配（先填滿左欄再右欄）
+        col = idx // row_count
+        row = idx % row_count
+        if label_idx == 77:
+            col = 1  # 強制將 label 77 放在第一欄
+            row = row_count -1
+        layout.addWidget(btn, row, col)
+        setattr(ui, f"pushButton_label_{label_idx}", btn)

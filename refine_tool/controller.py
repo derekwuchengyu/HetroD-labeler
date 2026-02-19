@@ -14,13 +14,13 @@ import base64
 from pathlib import Path
 
 sys.path.append('../')
-from VideoController import bind_common_shortcuts, common_keyPressEvent
+from base_video_controller import bind_common_shortcuts, common_keyPressEvent, setup_scenario_buttons
 from common_vars import (
     DATA_PATH, 
     MOTOR_BIKE_LABELS,
     CAR_TRUCK_LABELS,
     PED_LABELS,
-    LABEL_BUTTON_LIST
+    LABEL_BUTTON_TEXTS
 )
 #  python -m PyQt6.uic.pyuic label.ui -o UI.py
 
@@ -37,7 +37,7 @@ class MainWindow_controller(QMainWindow):
         self.motor_bike_labels = MOTOR_BIKE_LABELS
         self.car_truck_labels = CAR_TRUCK_LABELS
         self.ped_labels = PED_LABELS
-        self.label_button_list = LABEL_BUTTON_LIST
+        self.label_button_dict = LABEL_BUTTON_TEXTS
         # 根據 UI 模組決定 ToolTip 字體大小
         
         if "ui_ipad_mini" in ui_class.__module__.lower():
@@ -48,6 +48,9 @@ class MainWindow_controller(QMainWindow):
 
         self.data_path = DATA_PATH
         self.DATA_ID = DATA_ID
+
+        # 動態產生 scenario 按鈕（共用 function）
+        setup_scenario_buttons(self.ui, self.label_button_dict, self.set_label_button_selected)
 
         print(f"Loading track #{self.DATA_ID} data...")
         start_time = time()
@@ -115,7 +118,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
         # 設定 label 按鈕點擊事件
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
         
@@ -237,7 +240,7 @@ class MainWindow_controller(QMainWindow):
         elif cls == "pedestrian":
             blue_labels = set(self.ped_labels)
 
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if self.selected_label_idx is not None and i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
@@ -275,7 +278,7 @@ class MainWindow_controller(QMainWindow):
             ("Ego ID", ego_id),
             ("Other Actor ID", other_actor_id),
             ("Class", other_actor_class),
-            ("Min Distance", format_float(min_distance)),
+            ("Min-Distance", format_float(min_distance)),
             ("PET", f"{format_float(pet) if pet_str != 'inf' else 'inf'}\n"),
         ]
 
@@ -290,7 +293,7 @@ class MainWindow_controller(QMainWindow):
         if "ui_ipad_mini" in self.ui.__module__.lower():
             font.setPointSize(10)
         else:
-            font.setPointSize(16)
+            font.setPointSize(13)
 
         # 填入資料
         for row, (label, value) in enumerate(data):
@@ -300,6 +303,8 @@ class MainWindow_controller(QMainWindow):
             item_value.setFont(font)
             self.ui.tableWidget_label_info.setItem(row, 0, item_label)
             self.ui.tableWidget_label_info.setItem(row, 1, item_value)
+        self.ui.tableWidget_label_info.setColumnWidth(0, 160)
+        self.ui.tableWidget_label_info.setColumnWidth(1, 120)
 
     def next_actor(self):
         current_index = self.ui.comboBox_ego_id.currentIndex()
@@ -366,7 +371,7 @@ class MainWindow_controller(QMainWindow):
             # self.selected_label_idx_99 = False  # 重置 99 flag
 
         # 更新 UI 按鈕顏色
-        for i in self.label_button_list:
+        for i in self.label_button_dict.keys():
             btn = getattr(self.ui, f"pushButton_label_{i}")
             if i == self.selected_label_idx:
                 btn.setStyleSheet("color: red;")
