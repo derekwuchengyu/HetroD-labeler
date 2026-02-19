@@ -466,8 +466,8 @@ class MainWindow_controller(QMainWindow):
         # make this button to red after clicked
         self.ui.pushButton_check_label_done.setStyleSheet("color: red;")
 
-        # 自動跳下一個
-        self.ui.pushButton_next_actor.click()
+        # # 自動跳下一個
+        # self.next_actor()
 
     def mark_special_scenario(self):
         id_pair = self.ui.comboBox_ego_id.currentText()

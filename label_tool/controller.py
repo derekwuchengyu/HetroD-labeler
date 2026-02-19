@@ -13,6 +13,7 @@ import pandas as pd
 import platform
 import base64
 from pathlib import Path
+from functools import partial
 
 sys.path.append('../')
 from base_video_controller import bind_common_shortcuts, common_keyPressEvent, setup_scenario_buttons
@@ -121,7 +122,8 @@ class MainWindow_controller(QMainWindow):
         for i in self.label_button_dict.keys():
             try:
                 btn = getattr(self.ui, f"pushButton_label_{i}")
-                btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
+                btn.clicked.disconnect()  # 先斷開所有連接（如果已連接過）
+                btn.clicked.connect(partial(self.set_label_button_selected, i))
             except AttributeError:
                 print(f"Warning: pushButton_label_{i} not found in UI.")
 
@@ -748,7 +750,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
 
         # 自動跳下一個
-        self.ui.pushButton_next_actor.click()
+        self.next_actor()
 
     def mark_special_scenario(self):
         self.click_time()
