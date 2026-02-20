@@ -85,6 +85,7 @@ class BaseVideoController(object):
 
         self.show_object_location_trigger = False
         self.show_trackid_label = True  # 新增：預設顯示trackid label
+        self.extend_range_enabled = False  # 是否啟用擴展範圍功能
         self._onscreen_render_cache = {}
         self._slider_updating = False
         
@@ -229,6 +230,18 @@ class BaseVideoController(object):
         print("切換顯示 trackid label:", not self.show_trackid_label)
         self.show_trackid_label = not self.show_trackid_label
         self._update_label_frame(self.image_background.copy())
+
+    def toggle_extend_range(self):
+        """切換擴展範圍狀態"""
+        self.extend_range_enabled = not self.extend_range_enabled
+        if hasattr(self.ui, 'pushButton_extend_range'):
+            if self.extend_range_enabled:
+                self.ui.pushButton_extend_range.setStyleSheet("background-color: #4CAF50; color: white;")
+                self.ui.pushButton_extend_range.setText("Extend Range ✓")
+            else:
+                self.ui.pushButton_extend_range.setStyleSheet("")
+                self.ui.pushButton_extend_range.setText("Extend Range")
+        self.update_video_info()
 
     def update_play_or_stop_button_text(self):
         """更新播放/停止按鈕文字"""
@@ -740,6 +753,7 @@ def height_offset(width, length, heading):
     return max(width, length) / 2 + 10
 
 
+# ==========Button Setup Function==========
 def setup_scenario_buttons(ui, label_button_dict, set_label_button_selected):
     """
     動態產生 scenario 按鈕，加入 ui.verticalLayout_2。
@@ -773,3 +787,5 @@ def setup_scenario_buttons(ui, label_button_dict, set_label_button_selected):
             row = row_count -1
         layout.addWidget(btn, row, col)
         setattr(ui, f"pushButton_label_{label_idx}", btn)
+
+

@@ -10,7 +10,6 @@ class video_controller(BaseVideoController):
     """Refine tool 專用的視訊控制器"""
     
     USE_SECONDARY_SLIDER = True
-    BACKGROUND_FILENAME_TEMPLATE = "00_background.png"  # refine_tool 使用固定的背景檔名
 
     def __init__(self, data_path, ui, DATA_ID):
         super().__init__(data_path, ui, DATA_ID)
@@ -26,6 +25,18 @@ class video_controller(BaseVideoController):
             "2": 2,
             "1": 1,
         }
+
+    def toggle_extend_range(self):
+        """切換擴展範圍狀態"""
+        self.extend_range_enabled = not self.extend_range_enabled
+        if hasattr(self.ui, 'pushButton_extend_range'):
+            if self.extend_range_enabled:
+                self.ui.pushButton_extend_range.setStyleSheet("background-color: #4CAF50; color: white;")
+                self.ui.pushButton_extend_range.setText("Extend Range ✓")
+            else:
+                self.ui.pushButton_extend_range.setStyleSheet("")
+                self.ui.pushButton_extend_range.setText("Extend Range")
+        self.update_video_info()
 
     def update_video_info(self):
         """更新視訊資訊 - refine_tool 專用邏輯"""
@@ -68,23 +79,25 @@ class video_controller(BaseVideoController):
         min_target = max(0, min_overlay - offset)
         max_target = max_overlay + offset
 
-        # 檢查是否有儲存的 ego frame range
-        range_path = os.path.join(self.data_path, f"{self.DATA_ID}_ego_frame_range.json")
-        if os.path.exists(range_path):
-            with open(range_path, "r", encoding="utf-8") as f:
-                try:
-                    content = orjson.loads(f.read())
-                except Exception:
-                    content = {}
-            if id_pair in content:
-                print(f"Loaded ego frame range for {id_pair}: {content[id_pair]}")
-                min_target = content[id_pair].get("min_frame", min_target)
-                max_target = content[id_pair].get("max_frame", max_target)
+        if self.extend_range_enabled:
+            # Extend range by 100 frames beyond ego's presence
+            ego_frames_sorted = sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
+            ego_min = int(ego_frames_sorted[0])
+            ego_max = int(ego_frames_sorted[-1])
+            extend = 100
+            extended_min = max(0, min(ego_min - extend, min_target))
+            extended_max = max(ego_max + extend, max_target)
 
-        self.overlay_frame_list = [
-            f for f in sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
-            if min_target <= int(f) <= max_target
-        ]
+            self.overlay_frame_list = [
+                f for f in sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
+                if extended_min <= int(f) <= extended_max
+            ]
+            print(f"[Extended] extended_min: {extended_min}, extended_max: {extended_max}")
+        else:
+            self.overlay_frame_list = [
+                f for f in sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
+                if min_target <= int(f) <= max_target
+            ]
 
         self.total_frame_count = len(self.overlay_frame_list)
 

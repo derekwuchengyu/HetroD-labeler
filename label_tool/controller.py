@@ -52,6 +52,8 @@ class MainWindow_controller(QMainWindow):
         self.ped_labels = PED_LABELS
         self.label_button_dict = LABEL_BUTTON_TEXTS
 
+        self.auto_next = False  # 是否自動跳下一個 actor，預設關閉
+
         # 動態產生 scenario 按鈕（共用 function）
         setup_scenario_buttons(self.ui, self.label_button_dict, self.set_label_button_selected)
         
@@ -106,11 +108,14 @@ class MainWindow_controller(QMainWindow):
         self.ui.comboBox_ego_id.currentIndexChanged.connect(self.update_other_actor_id_combobox)
         self.ui.comboBox_other_actor_id.currentIndexChanged.connect(self.update_combobox_label_info)
         self.ui.pushButton_set_new_ego_id_range.clicked.connect(self.confirm_set_new_ego_id_range)
-        self.ui.pushButton_remove_ego_id.clicked.connect(self.confirm_remove_ego_id)  # 新增這行
+        self.ui.pushButton_remove_ego_id.clicked.connect(self.confirm_remove_ego_id)
 
         self.ui.pushButton_apply_actor_filter.clicked.connect(self.filter_actor_id_list)
         self.ui.pushButton_next_actor.clicked.connect(self.next_actor)
         self.ui.pushButton_prev_actor.clicked.connect(self.prev_actor)
+        self.ui.pushButton_auto_next.clicked.connect(self.auto_next_actor)
+
+        self.ui.pushButton_extend_range.clicked.connect(self.video_controller.toggle_extend_range)
 
         self.ui.pushButton_label_notice_on.setText("開啟label 提示")
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
@@ -118,14 +123,14 @@ class MainWindow_controller(QMainWindow):
 
 
 
-        # 設定 label 按鈕點擊事件
-        for i in self.label_button_dict.keys():
-            try:
-                btn = getattr(self.ui, f"pushButton_label_{i}")
-                btn.clicked.disconnect()  # 先斷開所有連接（如果已連接過）
-                btn.clicked.connect(partial(self.set_label_button_selected, i))
-            except AttributeError:
-                print(f"Warning: pushButton_label_{i} not found in UI.")
+        # # 設定 label 按鈕點擊事件
+        # for i in self.label_button_dict.keys():
+        #     try:
+        #         btn = getattr(self.ui, f"pushButton_label_{i}")
+        #         btn.clicked.disconnect()  # 先斷開所有連接（如果已連接過）
+        #         btn.clicked.connect(partial(self.set_label_button_selected, i))
+        #     except AttributeError:
+        #         print(f"Warning: pushButton_label_{i} not found in UI.")
 
         # 加入 label=99 按鈕（多種scenario）
         self.ui.pushButton_label_99.clicked.connect(lambda checked: self.set_label_button_selected(99))
@@ -750,7 +755,8 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_label_99.setStyleSheet("color: red;" if self.selected_label_idx_99 else "color: black;")
 
         # 自動跳下一個
-        self.next_actor()
+        if self.auto_next:
+            self.next_actor()
 
     def mark_special_scenario(self):
         self.click_time()
@@ -858,3 +864,13 @@ class MainWindow_controller(QMainWindow):
         # 使用共用 keyPressEvent
         if not common_keyPressEvent(self, event, self.ui, self.video_controller):
             super().keyPressEvent(event)
+
+    def auto_next_actor(self):
+        self.auto_next = not self.auto_next
+        if hasattr(self.ui, 'pushButton_auto_next'):
+            if self.auto_next:
+                self.ui.pushButton_auto_next.setStyleSheet("background-color: #4CAF50; color: white;")
+                self.ui.pushButton_auto_next.setText("Auto Next ✓")
+            else:
+                self.ui.pushButton_auto_next.setStyleSheet("")
+                self.ui.pushButton_auto_next.setText("Auto Next")

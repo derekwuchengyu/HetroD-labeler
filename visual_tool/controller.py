@@ -150,18 +150,19 @@ class MainWindow_controller(QMainWindow):
 
         # 新增：toggle label 顯示按鈕
         self.ui.pushButton_toggle_label.clicked.connect(self.video_controller.toggle_show_trackid_label)
+        self.ui.pushButton_extend_range.clicked.connect(self.video_controller.toggle_extend_range)
 
         self.update_label_checkboxes()
         # 預設顯示所有 label 的 agents
         self.show_label = set(self.unique_ego[self.ui.comboBox_ego_id.currentText()].keys())
-        # 除了0 (None)
-        self.show_label -= {0}
+        # # 除了0 (None)
+        # self.show_label -= {0}
         self.update_agents_display()
 
-        # 設定 label 按鈕點擊事件
-        for i in self.label_button_dict.keys():
-            btn = getattr(self.ui, f"pushButton_label_{i}")
-            btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
+        # # 設定 label 按鈕點擊事件
+        # for i in self.label_button_dict.keys():
+        #     btn = getattr(self.ui, f"pushButton_label_{i}")
+        #     btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
 
         # 綁定快捷鍵
         self._bind_shortcuts()
@@ -360,6 +361,7 @@ class MainWindow_controller(QMainWindow):
             return
 
         label_indices = sorted(self.unique_ego[ego_id].keys())
+        print(f"Available labels for ego {ego_id}: {label_indices}")
         for label_idx in label_indices:
             cb = QCheckBox(f"Label {label_idx}")
             cb.stateChanged.connect(lambda state, idx=label_idx: self.on_label_checkbox_changed(idx, state))

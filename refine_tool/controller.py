@@ -104,6 +104,8 @@ class MainWindow_controller(QMainWindow):
 
 
         self.current_id_pair = self.ui.comboBox_ego_id.currentText()
+        if not self.current_id_pair:
+            raise ValueError(f"No scenario found with label_idx {self.LABEL_IDX}. Please check the labeled_scenarios.json file.")
 
         print("Initializing video controller...")
         self.video_controller = video_controller(data_path=self.data_path, ui=self.ui, DATA_ID=self.DATA_ID)
@@ -114,13 +116,15 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_next_actor.clicked.connect(self.next_actor)
         self.ui.pushButton_prev_actor.clicked.connect(self.prev_actor)
 
+        self.ui.pushButton_extend_range.clicked.connect(self.video_controller.toggle_extend_range)
+
         self.ui.pushButton_label_notice_on.setText("開啟label 提示")
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
 
-        # 設定 label 按鈕點擊事件
-        for i in self.label_button_dict.keys():
-            btn = getattr(self.ui, f"pushButton_label_{i}")
-            btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
+        # # 設定 label 按鈕點擊事件
+        # for i in self.label_button_dict.keys():
+        #     btn = getattr(self.ui, f"pushButton_label_{i}")
+        #     btn.clicked.connect(lambda checked, idx=i: self.set_label_button_selected(idx))
         
         # 加入 label=99 按鈕（多種scenario）
         self.ui.pushButton_label_99.clicked.connect(lambda checked: self.set_label_button_selected(99))

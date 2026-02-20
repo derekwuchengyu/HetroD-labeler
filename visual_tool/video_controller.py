@@ -7,13 +7,13 @@ import orjson
 
 
 class video_controller(BaseVideoController):
-    """Refine tool 專用的視訊控制器"""
+    """Visual tool 專用的視訊控制器"""
     
     USE_SECONDARY_SLIDER = False
-    BACKGROUND_FILENAME_TEMPLATE = "00_background.png"  # refine_tool 使用固定的背景檔名
 
     def __init__(self, data_path, ui, DATA_ID):
         super().__init__(data_path, ui, DATA_ID)
+        self.extend_range_enabled = False
 
     def get_speed_map(self):
         """Refine tool 的速度選單"""

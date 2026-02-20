@@ -14,6 +14,7 @@ class video_controller(BaseVideoController):
 
     def __init__(self, data_path, ui, DATA_ID):
         super().__init__(data_path, ui, DATA_ID)
+        self.extend_range_enabled = False
 
     def get_speed_map(self):
         """Refine tool 的速度選單"""
@@ -54,10 +55,33 @@ class video_controller(BaseVideoController):
             max_overlay = int(overlay_frames[-1])
             min_target = max(0, min_overlay - offset)
             max_target = max_overlay + offset
-            self.overlay_frame_list = [
-                f for f in sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
-                if min_target <= int(f) <= max_target
-            ]
+
+            if self.extend_range_enabled:
+                # Extend range by 100 frames beyond ego's presence
+                ego_frames_sorted = sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
+                ego_min = int(ego_frames_sorted[0])
+                ego_max = int(ego_frames_sorted[-1])
+                extend = 100
+                extended_min = max(0, min(min_target, ego_min - extend))
+                extended_max = max(max_target, ego_max + extend)
+
+                # Union of ego and other_actor frames within the extended range
+                all_frames = sorted(
+                    set(self.current_ego_id_frame_list) | set(self.current_other_actor_id_frame_list),
+                    key=lambda x: int(x)
+                )
+                self.overlay_frame_list = [
+                    f for f in all_frames
+                    if extended_min <= int(f) <= extended_max
+                ]
+                print(f"[Extended] extended_min: {extended_min}, extended_max: {extended_max}, Overlay frames: {len(overlay_frames)}, Display frames: {len(self.overlay_frame_list)}")
+            else:
+                # Default: only ego frames within overlay offset range
+                self.overlay_frame_list = [
+                    f for f in sorted(self.current_ego_id_frame_list, key=lambda x: int(x))
+                    if min_target <= int(f) <= max_target
+                ]
+                print(f"min_target: {min_target}, max_target: {max_target}, Overlay frames: {len(overlay_frames)}, Display frames: {len(self.overlay_frame_list)}")
 
         self.total_frame_count = len(self.overlay_frame_list)
 

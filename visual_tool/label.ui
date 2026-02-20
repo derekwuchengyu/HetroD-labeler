@@ -304,7 +304,7 @@
     <property name="title">
      <string>播放範圍</string>
     </property>
-    <widget class="QPushButton" name="pushButton_range_expand_prev">
+    <widget class="QPushButton" name="pushButton_extend_range">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -312,36 +312,23 @@
       <rect>
        <x>4</x>
        <y>25</y>
-       <width>91</width>
+       <width>183</width>
        <height>38</height>
       </rect>
      </property>
      <property name="text">
-      <string>前擴100 fs</string>
+      <string>Extend Range</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_range_expand_next">
+    <widget class="QPushButton" name="pushButton_reset_frame_range">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>98</x>
-       <y>25</y>
-       <width>91</width>
-       <height>38</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>後擴100 fs</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_reset_frame_range">
-     <property name="geometry">
-      <rect>
-       <x>98</x>
+       <x>4</x>
        <y>68</y>
-       <width>91</width>
+       <width>183</width>
        <height>38</height>
       </rect>
      </property>
