@@ -937,5 +937,47 @@
     "min_frame": "2854",
     "max_frame": "3207",
     "label_idx": 0
+  },
+  "202_219": {
+    "ego_id": "202",
+    "actor_id": "219",
+    "min_frame": "2951",
+    "max_frame": "3135",
+    "label_idx": 0
+  },
+  "222_219": {
+    "ego_id": "222",
+    "actor_id": "219",
+    "min_frame": "3002",
+    "max_frame": "3626",
+    "label_idx": 77
+  },
+  "227_219": {
+    "ego_id": "227",
+    "actor_id": "219",
+    "min_frame": "3114",
+    "max_frame": "3713",
+    "label_idx": 0
+  },
+  "229_219": {
+    "ego_id": "229",
+    "actor_id": "219",
+    "min_frame": "3177",
+    "max_frame": "3754",
+    "label_idx": 77
+  },
+  "247_179": {
+    "ego_id": "247",
+    "actor_id": "179",
+    "min_frame": "3583",
+    "max_frame": "3908",
+    "label_idx": 0
+  },
+  "271_465": {
+    "ego_id": "271",
+    "actor_id": "465",
+    "min_frame": "7071",
+    "max_frame": "7335",
+    "label_idx": 0
   }
 }

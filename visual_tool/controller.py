@@ -450,6 +450,7 @@ class MainWindow_controller(QMainWindow):
         self.show_label = set(self.unique_ego[self.ui.comboBox_ego_id.currentText()].keys())
                 
         self.update_combobox_label_info()
+        self.update_agents_display()
 
     def _bind_shortcuts(self):
         # 讓主視窗能接收鍵盤事件

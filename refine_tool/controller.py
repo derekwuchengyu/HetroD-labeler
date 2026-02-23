@@ -357,9 +357,7 @@ class MainWindow_controller(QMainWindow):
         if int(current_actor_id) > 0:
             # 找下一個ego 
             for i in range(total):
-                print("current_index+i % total:", current_index+i % total)
                 id_pair = self.ui.comboBox_ego_id.itemText(current_index+i % total)  # 從下一個開始找，並循環回到開頭
-                print(f"Checking id_pair: {id_pair} against current_actor_id: {current_actor_id}")
                 if not id_pair.startswith(f"{current_actor_id}_"):
                     print(f"Found next id_pair: {id_pair} set  target_index: {current_index+i}")
                     target_index = current_index+i
