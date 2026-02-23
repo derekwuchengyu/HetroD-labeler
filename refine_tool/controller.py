@@ -133,6 +133,7 @@ class MainWindow_controller(QMainWindow):
         self.selected_label_btn_idx = None  # 記錄目前選中的 label 按鈕
 
         self.ui.pushButton_check_label_done.clicked.connect(self.save_current_checked)
+        self.ui.pushButton_ego_check_label_done.clicked.connect(self.batch_save_current_checked)
 
         # 新增 reset frame range bar 按鈕事件
         self.ui.pushButton_reset_frame_range.clicked.connect(self.reset_frame_range_bar)
@@ -195,6 +196,9 @@ class MainWindow_controller(QMainWindow):
             self.ui.pushButton_check_label_done.setStyleSheet("color: red;")
         else:
             self.ui.pushButton_check_label_done.setStyleSheet("color: black;")
+
+        # ## Ego all check label
+        # TODO
 
         # 讀取已標註 scenario
         save_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
@@ -342,6 +346,37 @@ class MainWindow_controller(QMainWindow):
         self.video_controller.setslidervalue(0)
         self.video_controller.current_frame_no = 0
 
+    def next_ego(self, current_actor_id):
+        current_index = self.ui.comboBox_ego_id.currentIndex()
+        total = self.ui.comboBox_ego_id.count()
+        if total == 0:
+            return
+        
+        next_index = current_index + 1
+        print(f"Current index: {current_index}, Total: {total}, Next index: {next_index}")
+        if int(current_actor_id) > 0:
+            # 找下一個ego 
+            for i in range(total):
+                print("current_index+i % total:", current_index+i % total)
+                id_pair = self.ui.comboBox_ego_id.itemText(current_index+i % total)  # 從下一個開始找，並循環回到開頭
+                print(f"Checking id_pair: {id_pair} against current_actor_id: {current_actor_id}")
+                if not id_pair.startswith(f"{current_actor_id}_"):
+                    print(f"Found next id_pair: {id_pair} set  target_index: {current_index+i}")
+                    target_index = current_index+i
+                    break
+            next_index = target_index
+        
+        if next_index < total:
+            self.ui.comboBox_ego_id.setCurrentIndex(next_index)
+        else:
+            self.ui.comboBox_ego_id.setCurrentIndex(0)
+
+        
+        self.video_controller.range_slider.setMinimum(0)
+        self.video_controller.setslidervalue(0)
+        self.video_controller.current_frame_no = 0
+
+
     def set_label_button_selected(self, selected_idx):
         id_pair = self.ui.comboBox_ego_id.currentText()
         ego_id, actor_id = id_pair.split("_")
@@ -472,6 +507,26 @@ class MainWindow_controller(QMainWindow):
 
         # # 自動跳下一個
         self.next_actor()
+
+    def batch_save_current_checked(self):
+        # 取得目前 comboBox 中的所有 id_pair
+        ego = self.ui.comboBox_ego_id.currentText().split("_")[0]
+        checked_list = []
+        for i in range(self.ui.comboBox_ego_id.count()):
+            id_pair = self.ui.comboBox_ego_id.itemText(i)
+            if id_pair.startswith(ego + "_"):
+                checked_list.append(id_pair)
+
+        # 儲存到 label_check.txt
+        path = os.path.join(self.data_path, f"{self.DATA_ID}_label_check.txt")
+        with open(path, "a", encoding="utf-8") as f:
+            for id_pair in checked_list:
+                f.write(f"{id_pair}\n")
+
+        # 更新按鈕顏色
+        self.ui.pushButton_ego_check_label_done.setStyleSheet("color: red;")
+
+        self.next_ego(current_actor_id=ego)
 
     def mark_special_scenario(self):
         id_pair = self.ui.comboBox_ego_id.currentText()

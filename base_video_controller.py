@@ -124,6 +124,29 @@ class BaseVideoController(object):
             """)
             self.ui.verticalLayout.addWidget(self.secondary_slider)
 
+        self.ui.comboBox_ego_id.setStyleSheet("""
+            QComboBox QAbstractItemView {
+                scrollbar: vertical;
+                selection-background-color: #e0e0e0;
+            }
+            QScrollBar:vertical {
+                width: 16px;
+                background: #f0f0f0;
+                margin: 0px;
+                border-radius: 4px;
+            }
+            QScrollBar::handle:vertical {
+                background: #888;
+                min-height: 20px;
+                border-radius: 4px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+            """)
+        # self.ui.comboBox_ego_id.setMaxVisibleItems(20)
+        self.ui.comboBox_ego_id.view().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+
         # 建立 range_slider
         self.range_slider = QRangeSlider(Qt.Horizontal)
         self.ui.verticalLayout.addWidget(self.range_slider)
