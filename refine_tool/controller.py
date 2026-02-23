@@ -86,7 +86,7 @@ class MainWindow_controller(QMainWindow):
         else:
             return
         
-        keys = list(labeled_dict.keys())
+        keys = sorted(labeled_dict.keys(), key=lambda k: (int(k.split('_')[0]), int(k.split('_')[1])))
 
         self.ui.comboBox_ego_id.clear()
 
@@ -471,7 +471,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.pushButton_check_label_done.setStyleSheet("color: red;")
 
         # # 自動跳下一個
-        # self.next_actor()
+        self.next_actor()
 
     def mark_special_scenario(self):
         id_pair = self.ui.comboBox_ego_id.currentText()

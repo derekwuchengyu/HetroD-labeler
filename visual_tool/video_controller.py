@@ -26,7 +26,7 @@ class video_controller(BaseVideoController):
         }
 
     def update_video_info(self):
-        """更新視訊資訊 - refine_tool 專用邏輯"""
+        """更新視訊資訊 - visual_tool 專用邏輯"""
         id_pair = self.ui.comboBox_ego_id.currentText()
         if not id_pair or "_" not in id_pair:
             return

@@ -930,5 +930,12 @@
     "min_frame": "2409",
     "max_frame": "3348",
     "label_idx": 0
+  },
+  "62_180": {
+    "ego_id": "62",
+    "actor_id": "180",
+    "min_frame": "2854",
+    "max_frame": "3207",
+    "label_idx": 0
   }
 }

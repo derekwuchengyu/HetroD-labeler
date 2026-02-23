@@ -106,6 +106,9 @@ class Ui_MainWindow(object):
         self.pushButton_to_the_end = QtWidgets.QPushButton(parent=self.centralwidget)
         self.pushButton_to_the_end.setGeometry(QtCore.QRect(1296, 620, 53, 81))
         self.pushButton_to_the_end.setObjectName("pushButton_to_the_end")
+        self.pushButton_renew_data = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.pushButton_renew_data.setGeometry(QtCore.QRect(1405, 71, 89, 51))
+        self.pushButton_renew_data.setObjectName("pushButton_renew_data")
         self.widget.raise_()
         self.label_3.raise_()
         self.label_videoframe.raise_()
@@ -128,6 +131,7 @@ class Ui_MainWindow(object):
         self.pushButton_special_scenario.raise_()
         self.groupBox.raise_()
         self.pushButton_to_the_end.raise_()
+        self.pushButton_renew_data.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -157,3 +161,4 @@ class Ui_MainWindow(object):
         self.pushButton_extend_range.setText(_translate("MainWindow", "Extend Range"))
         self.pushButton_reset_frame_range.setText(_translate("MainWindow", "Reset Full"))
         self.pushButton_to_the_end.setText(_translate("MainWindow", "End"))
+        self.pushButton_renew_data.setText(_translate("MainWindow", "Renew Data"))

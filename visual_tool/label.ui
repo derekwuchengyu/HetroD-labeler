@@ -350,6 +350,19 @@
      <string>End</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_renew_data">
+    <property name="geometry">
+     <rect>
+      <x>1405</x>
+      <y>71</y>
+      <width>89</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Renew Data</string>
+    </property>
+   </widget>
    <zorder>widget</zorder>
    <zorder>label_3</zorder>
    <zorder>label_videoframe</zorder>
@@ -372,6 +385,7 @@
    <zorder>pushButton_special_scenario</zorder>
    <zorder>groupBox</zorder>
    <zorder>pushButton_to_the_end</zorder>
+   <zorder>pushButton_renew_data</zorder>
   </widget>
  </widget>
  <resources/>

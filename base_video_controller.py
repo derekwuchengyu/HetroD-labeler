@@ -704,7 +704,7 @@ def common_keyPressEvent(window, event, ui, video_controller):
         ui.pushButton_prev_actor.click()
     elif key == Qt.Key.Key_D:
         ui.pushButton_next_actor.click()
-    elif key == Qt.Key.Key_P:
+    elif key == Qt.Key.Key_P or key == Qt.Key.Key_U:
         now = time()
         if not hasattr(window, "_last_space_press_time"):
             window._last_space_press_time = 0

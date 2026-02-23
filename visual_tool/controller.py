@@ -71,55 +71,32 @@ class MainWindow_controller(QMainWindow):
         print(f"load pet_lookup time: {time() - start_time:.2f} sec")
 
         # 讀取 label 99 標記
-        complex_path = os.path.join(self.data_path, f"{self.DATA_ID}_complex_scenarios.json")
-        if os.path.exists(complex_path):
-            with open(complex_path, "r", encoding="utf-8") as f:
+        self.complex_path = os.path.join(self.data_path, f"{self.DATA_ID}_complex_scenarios.json")
+        if os.path.exists(self.complex_path):
+            with open(self.complex_path, "r", encoding="utf-8") as f:
                 self.complex_dict = orjson.loads(f.read())
         else:
             return
 
         # 讀取特別scenario標記
-        special_path = os.path.join(self.data_path, f"{self.DATA_ID}_special_scenarios.json")
-        if os.path.exists(special_path):
-            with open(special_path, "r", encoding="utf-8") as f:
+        self.special_path = os.path.join(self.data_path, f"{self.DATA_ID}_special_scenarios.json")
+        if os.path.exists(self.special_path):
+            with open(self.special_path, "r", encoding="utf-8") as f:
                 self.special_dict = orjson.loads(f.read())
         else:
             return
         
         # load labeled scenarios 
-        save_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
+        self.labeled_path = os.path.join(self.data_path, f"{self.DATA_ID}_labeled_scenarios.json")
+        self.load_labeled_scenario_info()
         print(f"load labeled_scenarios.json time: {time() - start_time:.2f} sec")
-        if os.path.exists(save_path):
-            with open(save_path, "r", encoding="utf-8") as f:
-                labeled_dict = orjson.loads(f.read())
-        else:
-            return
-        print(f"load labeled_scenarios.json time: {time() - start_time:.2f} sec")
-        start_time = time() 
         
-        # unique_ego[ego_id][label_idx][actor_id] = (min_frame, max_frame)
-        self.unique_ego = {}
-        for key in labeled_dict.keys():
-            ego_id = labeled_dict[key]['ego_id']
-            actor_id = labeled_dict[key]['actor_id']
-            min_frame = labeled_dict[key]['min_frame']
-            max_frame = labeled_dict[key]['max_frame']
-            label_idx = labeled_dict[key]['label_idx']
-            if ego_id not in self.unique_ego:
-                self.unique_ego[ego_id] = {}
-            if label_idx not in self.unique_ego[ego_id]:
-                self.unique_ego[ego_id][label_idx] = {}
-            self.unique_ego[ego_id][label_idx][actor_id] = (min_frame, max_frame)
 
-        print(f"load labeled_scenarios.json time: {time() - start_time:.2f} sec")
-        start_time = time() 
-
-        ego_ids = list(self.unique_ego.keys())
+        ego_ids = sorted(self.unique_ego.keys(), key=lambda x: int(x))
         self.ui.comboBox_ego_id.clear()
         for id in ego_ids:
-            if len(set(self.unique_ego[id].keys())-{0}) == 0:
-                pass
-                # continue
+            # if len(set(self.unique_ego[id].keys())-{0}) == 0:
+            #     continue
             self.ui.comboBox_ego_id.addItem(id)
 
         self.update_combobox_label_info()
@@ -140,6 +117,7 @@ class MainWindow_controller(QMainWindow):
         self.ui.comboBox_ego_id.currentIndexChanged.connect(self.update_label_checkboxes)
         self.ui.pushButton_next_actor.clicked.connect(self.next_actor)
         self.ui.pushButton_prev_actor.clicked.connect(self.prev_actor)
+        self.ui.pushButton_renew_data.clicked.connect(self.renew_labeled_info)
         self.label_tooltip_on = False  # 預設關閉
         self.ui.pushButton_label_notice_on.setText("開啟label 提示")
         self.ui.pushButton_label_notice_on.clicked.connect(self.toggle_label_tooltips)
@@ -360,13 +338,13 @@ class MainWindow_controller(QMainWindow):
             self.video_controller.clear_agents()
             return
 
-        label_indices = sorted(self.unique_ego[ego_id].keys())
-        print(f"Available labels for ego {ego_id}: {label_indices}")
+        label_indices = sorted(self.unique_ego[ego_id].keys(), key=lambda x: int(x))
         for label_idx in label_indices:
             cb = QCheckBox(f"Label {label_idx}")
             cb.stateChanged.connect(lambda state, idx=label_idx: self.on_label_checkbox_changed(idx, state))
             self.label_checkbox_layout.addWidget(cb)
             self.label_checkboxes[label_idx] = cb
+        self.update_combobox_label_info()    
 
         # 預設全選，如果沒有可選label則清空
         valid_labels = set(label_indices) # - {0}
@@ -374,6 +352,9 @@ class MainWindow_controller(QMainWindow):
         for label_idx, cb in self.label_checkboxes.items():
             cb.setChecked(label_idx in self.show_label)
         self.update_agents_display()
+        
+
+        
 
     def update_agents_display(self):
         ego_id = self.ui.comboBox_ego_id.currentText()
@@ -435,6 +416,40 @@ class MainWindow_controller(QMainWindow):
         # 已由 update_agents_display 取代
         pass
 
+    def load_labeled_scenario_info(self):
+        if os.path.exists(self.labeled_path):
+            with open(self.labeled_path, "r", encoding="utf-8") as f:
+                labeled_dict = orjson.loads(f.read())
+        else:
+            return
+        
+        # unique_ego[ego_id][label_idx][actor_id] = (min_frame, max_frame)
+        self.unique_ego = {}
+        for key in labeled_dict.keys():
+            ego_id = labeled_dict[key]['ego_id']
+            actor_id = labeled_dict[key]['actor_id']
+            min_frame = labeled_dict[key]['min_frame']
+            max_frame = labeled_dict[key]['max_frame']
+            label_idx = labeled_dict[key]['label_idx']
+            if ego_id not in self.unique_ego:
+                self.unique_ego[ego_id] = {}
+            if label_idx not in self.unique_ego[ego_id]:
+                self.unique_ego[ego_id][label_idx] = {}
+            self.unique_ego[ego_id][label_idx][actor_id] = (min_frame, max_frame)
+
+            
+
+    def renew_labeled_info(self):
+        self.load_labeled_scenario_info()
+        with open(self.complex_path, "r", encoding="utf-8") as f:
+                self.complex_dict = orjson.loads(f.read())
+        with open(self.special_path, "r", encoding="utf-8") as f:
+                self.special_dict = orjson.loads(f.read())
+
+        # show all labels
+        self.show_label = set(self.unique_ego[self.ui.comboBox_ego_id.currentText()].keys())
+                
+        self.update_combobox_label_info()
 
     def _bind_shortcuts(self):
         # 讓主視窗能接收鍵盤事件
@@ -446,3 +461,5 @@ class MainWindow_controller(QMainWindow):
         # 使用共用 keyPressEvent
         if not common_keyPressEvent(self, event, self.ui, self.video_controller):
             super().keyPressEvent(event)
+
+    
