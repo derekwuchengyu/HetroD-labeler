@@ -74,7 +74,7 @@ class BaseVideoController(object):
         # 預設值 (taiwan_urban)
 
         self.dataset_type = "taiwan_urban"
-        if self.DATA_ID == "18":
+        if self.DATA_ID in ["18", "27"]:
             self.dataset_type = "ind"
 
         self.ortho_px_to_meter = self.DATASET_META.get(self.dataset_type, {}).get("ortho_px_to_meter", 0.0499967249445942)
@@ -766,6 +766,14 @@ def common_keyPressEvent(window, event, ui, video_controller):
             new_frame = min(video_controller.total_frame_count - 1, video_controller.current_frame_no + 1)
             video_controller.setslidervalue(new_frame)
             video_controller.current_frame_no = new_frame
+    elif key == Qt.Key.Key_BracketLeft:
+        if hasattr(video_controller, "range_slider"):
+            min_frame, max_frame = video_controller.range_slider.value()
+            video_controller.range_slider.setValue((video_controller.current_frame_no, max_frame))
+    elif key == Qt.Key.Key_BracketRight:
+        if hasattr(video_controller, "range_slider"):
+            min_frame, max_frame = video_controller.range_slider.value()
+            video_controller.range_slider.setValue((min_frame, video_controller.current_frame_no))
     else:
         handled = False
     return handled

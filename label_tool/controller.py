@@ -54,6 +54,8 @@ class MainWindow_controller(QMainWindow):
 
         self.auto_next = False  # 是否自動跳下一個 actor，預設關閉
 
+        self.skip_actor_id_list = [8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]  # 存放要跳過的 actor_id
+
         # 動態產生 scenario 按鈕（共用 function）
         setup_scenario_buttons(self.ui, self.label_button_dict, self.set_label_button_selected)
         
@@ -83,6 +85,8 @@ class MainWindow_controller(QMainWindow):
 
         self.ui.comboBox_ego_id.clear()
         for ego_id in ego_id_list:
+            if self.DATA_ID == '27' and ego_id in self.skip_actor_id_list:
+                continue
             self.ui.comboBox_ego_id.addItem(ego_id)
         
         self.current_ego_id = self.ui.comboBox_ego_id.currentText()
@@ -90,6 +94,8 @@ class MainWindow_controller(QMainWindow):
         other_actor_id = self.id_list[str(self.current_ego_id)]
         self.ui.comboBox_other_actor_id.clear()
         for actor_id in other_actor_id:
+            if self.DATA_ID == '27' and actor_id in self.skip_actor_id_list:
+                continue
             self.ui.comboBox_other_actor_id.addItem(str(actor_id))
         
         print("Initializing video controller...")
@@ -194,7 +200,7 @@ class MainWindow_controller(QMainWindow):
 
         if self.show_only_unlabeled_ego:
             # 過濾未標註過的 ego_id
-            filtered_ego_id_list = [eid for eid in all_ego_id_list if eid not in ego_done_list]
+            filtered_ego_id_list = [eid for eid in all_ego_id_list if eid not in ego_done_list and int(eid) not in self.skip_actor_id_list]
             self.ui.pushButton_show_unlabeled_ego.setText("Show all ego")
         else:
             filtered_ego_id_list = all_ego_id_list
@@ -296,6 +302,8 @@ class MainWindow_controller(QMainWindow):
 
             # 只要有一個條件符合就納入
             if pet_ok or dist_ok:
+                if self.DATA_ID == '27' and actor_id in self.skip_actor_id_list:
+                    continue
                 filtered_list.append(actor_id)
             
 
@@ -486,6 +494,9 @@ class MainWindow_controller(QMainWindow):
 
 
         self.update_current_pet_min_distance_dict()
+
+        self.quick_setup()
+        self.filter_actor_id_list()
 
     def toggle_show_only_unlabeled(self):
         self.click_time()
