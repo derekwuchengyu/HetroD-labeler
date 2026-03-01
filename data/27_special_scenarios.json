@@ -6,5 +6,37 @@
     "max_frame": "20378",
     "label_idx": null,
     "timestamp": "2026-02-26 16:58:54"
+  },
+  "84_80": {
+    "ego_id": "84",
+    "actor_id": "80",
+    "min_frame": "3028",
+    "max_frame": "3314",
+    "label_idx": null,
+    "timestamp": "2026-02-27 15:01:35"
+  },
+  "86_83": {
+    "ego_id": "86",
+    "actor_id": "83",
+    "min_frame": "3205",
+    "max_frame": "3457",
+    "label_idx": null,
+    "timestamp": "2026-02-27 15:02:59"
+  },
+  "116_117": {
+    "ego_id": "116",
+    "actor_id": "117",
+    "min_frame": "5201",
+    "max_frame": "5543",
+    "label_idx": null,
+    "timestamp": "2026-02-27 15:16:26"
+  },
+  "141_133": {
+    "ego_id": "141",
+    "actor_id": "133",
+    "min_frame": "6591",
+    "max_frame": "6806",
+    "label_idx": 31,
+    "timestamp": "2026-02-27 15:46:44"
   }
 }

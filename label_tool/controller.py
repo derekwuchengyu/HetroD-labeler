@@ -163,8 +163,8 @@ class MainWindow_controller(QMainWindow):
         self.click_time()  # 記錄按下時間
         
         # 設定 doubleSpinBox 數值
-        self.ui.doubleSpinBox_pet_min.setValue(-15)
-        self.ui.doubleSpinBox_pet_max.setValue(15)
+        self.ui.doubleSpinBox_pet_min.setValue(-9)
+        self.ui.doubleSpinBox_pet_max.setValue(9)
         self.ui.doubleSpinBox_distance_max.setValue(5)
         
         # 設定 checkBox 為 True

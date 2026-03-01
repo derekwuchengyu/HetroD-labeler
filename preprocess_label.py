@@ -1,4 +1,5 @@
 
+import os
 import pandas as pd
 import json
 
@@ -118,3 +119,27 @@ for idx, row in df.iterrows():
 with open(f'./data/{DATA_ID}_trackid_class.json', 'w', encoding='utf-8') as f:
     json.dump(trackid_class, f, ensure_ascii=False, indent=2)
 print(f"trackid_class 已儲存至 ./data/{DATA_ID}_trackid_class.json")
+
+
+# 生成 mini track_frame_dict（前 10 個 track，供 DEBUG_MODE 使用）
+mini_track_ids = list(track_frame_dict.keys())[:10]
+track_frame_dict_mini = {tid: track_frame_dict[tid] for tid in mini_track_ids}
+with open(f'./data/{DATA_ID}_track_frame_dict_mini.json', 'w', encoding='utf-8') as f:
+    json.dump(track_frame_dict_mini, f, ensure_ascii=False, indent=2)
+print(f"track_frame_dict_mini 已儲存至 ./data/{DATA_ID}_track_frame_dict_mini.json")
+
+
+# 初始化 label tool 所需的空白 JSON 檔案（若不存在則建立）
+init_files = [
+    (f'./data/{DATA_ID}_labeled_scenarios.json', {}),
+    (f'./data/{DATA_ID}_complex_scenarios.json', {}),
+    (f'./data/{DATA_ID}_special_scenarios.json', {}),
+    (f'./data/{DATA_ID}_ego_done.json', []),
+]
+for fpath, default in init_files:
+    if not os.path.exists(fpath):
+        with open(fpath, 'w', encoding='utf-8') as f:
+            json.dump(default, f, ensure_ascii=False, indent=2)
+        print(f"{fpath} 已初始化")
+    else:
+        print(f"{fpath} 已存在，跳過")
