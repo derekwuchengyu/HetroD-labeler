@@ -119533,5 +119533,13 @@
     "max_frame": "9354",
     "label_idx": 16,
     "timestamp": "2026-02-26 23:07:33"
+  },
+  "717_672": {
+    "ego_id": "717",
+    "actor_id": "672",
+    "min_frame": "12124",
+    "max_frame": "12693",
+    "label_idx": 0,
+    "timestamp": "2026-03-01 22:56:44"
   }
 }
