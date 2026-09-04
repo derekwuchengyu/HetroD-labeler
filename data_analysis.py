@@ -3,6 +3,7 @@ import json
 import matplotlib.pyplot as plt
 from collections import Counter
 import argparse
+from common_vars import LABEL_BUTTON_TEXTS
 
 def load_labeled_scenarios(file_path):
     with open(file_path, 'r') as file:
@@ -16,25 +17,7 @@ if __name__ == "__main__":
     # file_path = f'./data/{args.id}_labeled_scenarios.json'
     file_path = f'/home/hcis-s19/Documents/ChengYu/HetroD-labeler/data/{args.id}_labeled_scenarios.json'
 
-    idx_to_label = {
-        0: "None",
-        1: "直行 + 左轉",
-        2: "左轉 + 直行",
-        3: "並行 機車加速通過",
-        4: "並行 機車等速通過",
-        5: "並行 機車減速",
-        6: "繞過前方車輛",
-        7: "被 右側 cut-in",
-        8: "被 左側 cut-in",
-        9: "右轉 + 機車直行與待轉",
-        10: "左轉 + 機車待轉",
-        11: "右轉 + 行人通過",
-        12: "左轉 + 行人通過",
-        13: "cut-out + 右側直行",
-        14: "cut-out + 左側直行",
-        15: "左轉 + 左側機車通過",
-        88: "不確定",
-    }
+    idx_to_label = LABEL_BUTTON_TEXTS
 
     scenarios = load_labeled_scenarios(file_path)
     # print(scenarios.keys())
@@ -55,8 +38,8 @@ if __name__ == "__main__":
         # ignore index 0 (None)
 
         # 確保 label_idx 在有效範圍內
-        if (1 <= label_idx <= 15) or label_idx == 88 or label_idx == 99:
-            label_counts[label_idx] += 1
+            if label_idx < 88 :
+                label_counts[label_idx] += 1
     
     print("Label 統計結果:")
     print("=" * 70)
@@ -65,6 +48,8 @@ if __name__ == "__main__":
     
     total_count = sum(label_counts.values())
     for i, count in label_counts.items():
+        if count == 0:
+            continue
         percentage = (count / total_count * 100) if total_count > 0 else 0
         print(f"{i:2d}   | {count:5d}     | {percentage:5.1f}% | {idx_to_label[i]:<25} ")
     

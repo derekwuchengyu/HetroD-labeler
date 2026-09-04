@@ -25,7 +25,7 @@ from common_vars import (
 
 
 class MainWindow_controller(QMainWindow):
-    def __init__(self, ui_class, DATA_ID='00'):
+    def __init__(self, ui_class, DATA_ID='00', only_special=False, label_filter=None):
         super().__init__()
         self.ui = ui_class()
         self.ui.setupUi(self)
@@ -83,6 +83,10 @@ class MainWindow_controller(QMainWindow):
         if os.path.exists(self.special_path):
             with open(self.special_path, "r", encoding="utf-8") as f:
                 self.special_dict = orjson.loads(f.read())
+            self.selected_special_scenario = set()
+            for key in self.special_dict.keys():
+                self.selected_special_scenario.add(key.split('_')[0])
+            self.selected_special_scenario = sorted(self.selected_special_scenario, key=lambda x: int(x))
         else:
             return
         
@@ -94,10 +98,17 @@ class MainWindow_controller(QMainWindow):
 
         ego_ids = sorted(self.unique_ego.keys(), key=lambda x: int(x))
         self.ui.comboBox_ego_id.clear()
-        for id in ego_ids:
-            # if len(set(self.unique_ego[id].keys())-{0}) == 0:
-            #     continue
-            self.ui.comboBox_ego_id.addItem(id)
+        if only_special:
+            for id in self.selected_special_scenario:
+                self.ui.comboBox_ego_id.addItem(id)
+        else:
+            for id in ego_ids:
+                if len(set(self.unique_ego[id].keys())-{0}) == 0:
+                    continue
+                # 有指定 label_filter 時,過濾掉完全沒有參與該 label 的 ego
+                if label_filter is not None and label_filter not in self.unique_ego[id]:
+                    continue
+                self.ui.comboBox_ego_id.addItem(id)
 
         self.update_combobox_label_info()
 

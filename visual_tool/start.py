@@ -14,8 +14,11 @@ def main():
                         help='Specify the DATA_ID to use')
     parser.add_argument('--label', '-lb',
                         type=int,
-                        default=2,
-                        help='Specify the label index to filter')
+                        default=None,
+                        help='Specify the label index to filter (only show egos containing this label)')
+    parser.add_argument('--onlyspecial', '-sp',
+                        action='store_true',
+                        help='Special case label index to filter')
     
     args = parser.parse_args()
     
@@ -30,7 +33,7 @@ def main():
     
     # 建立主視窗，傳入對應的 UI 類別
     from controller import MainWindow_controller
-    window = MainWindow_controller(Ui_MainWindow, DATA_ID=args.data_id)
+    window = MainWindow_controller(Ui_MainWindow, DATA_ID=args.data_id, only_special=args.onlyspecial, label_filter=args.label)
     window.show()
 
     sys.exit(app.exec())

@@ -16,6 +16,7 @@ import json
 # 00_tracksMeta --> contain all tracks 
 
 DATA_ID = '27'
+DATA_ID = '00'
 
 file_path = f'./data/{DATA_ID}_tracksMeta.csv'
 
@@ -56,16 +57,17 @@ total_ids = sum(len(ids) for ids in result.values())
 print(f"所有 key 對應的 ids 總數: {total_ids}")
 
 # 所有 key 對應的 ids 總數: 135265
-
+# HetroD 00所有 key 對應的 ids 總數: 97521
+exit()
 
 with open(f'./data/{DATA_ID}_trackid_objects.json', 'w', encoding='utf-8') as f:
     json.dump(result, f, ensure_ascii=False, indent=2)
 print(f"result 已儲存至 ./data/{DATA_ID}_trackid_objects.json")
 
 
-
 track_file = f'./data/{DATA_ID}_tracks.csv'
 track_csv = pd.read_csv(track_file)
+
 
 # # 建立 trackId 為 key 的 dict
 # track_dict = {}
